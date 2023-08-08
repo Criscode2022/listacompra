@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "short_name": "app",
+  "name": "La lista de la compra",
+  "short_name": "La lista",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
