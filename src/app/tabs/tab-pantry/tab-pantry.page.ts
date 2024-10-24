@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
-import { DataService } from '../../../core/services/data-service/data.service';
+import { DataService } from 'src/app/core/services/data-service/data.service';
 
 @Component({
   selector: 'app-tab-pantry',
@@ -13,7 +13,7 @@ import { DataService } from '../../../core/services/data-service/data.service';
 })
 export class TabPantry implements OnInit {
   private alertController = inject(AlertController);
-  private dataService = inject(DataService);
+  protected dataService = inject(DataService);
 
   protected products = this.dataService.products;
 
@@ -21,10 +21,15 @@ export class TabPantry implements OnInit {
     this.dataService.storageInitialized.subscribe(() => {});
   }
 
-  protected async handleToggleChange(productName: string, event: Event) {
-    const customEvent = event as CustomEvent;
-    const isChecked = customEvent.detail.checked;
-    await this.dataService.storeData(productName);
+  protected async handleToggleChange(productName: string) {
+    this.products.update((products) => {
+      return products.map((p) => {
+        if (p.name === productName) {
+          p.checked = !p.checked;
+        }
+        return p;
+      });
+    });
   }
 
   protected async addProduct() {
@@ -54,6 +59,7 @@ export class TabPantry implements OnInit {
             }
 
             const existingProducts = this.products();
+
             if (
               existingProducts.some(
                 (product) => product.name === data.productName
@@ -97,10 +103,6 @@ export class TabPantry implements OnInit {
     document.addEventListener('keydown', enterListener);
 
     await alert.present();
-  }
-
-  protected async deleteProduct(productName: string) {
-    await this.dataService.delete(productName, false);
   }
 
   protected async clearStorage() {

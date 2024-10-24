@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
-import { DataService } from '../../../core/services/data-service/data.service';
+import { DataService } from 'src/app/core/services/data-service/data.service';
 
 @Component({
   selector: 'app-tab-urgent',
@@ -11,34 +11,18 @@ import { DataService } from '../../../core/services/data-service/data.service';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule],
 })
-export class TabUrgent implements OnInit {
-  private dataService = inject(DataService);
+export class TabUrgent {
   private alertController = inject(AlertController);
+  private dataService = inject(DataService);
 
-  private products = [] as any[];
-  protected urgentProducts = [] as any[];
+  protected products = this.dataService.products;
 
-  ngOnInit(): void {
-    this.dataService.storageInitialized.subscribe(() => {
-      this.fetchProducts();
+  protected async handleToggleChange(productName: string) {
+    this.products.update((products) => {
+      return products.filter((product) => {
+        return product.name !== productName;
+      });
     });
-  }
-
-  private async fetchProducts() {
-    this.products = await this.dataService.getProducts(false);
-    this.urgentProducts = await this.dataService.getProducts(true);
-    console.log('Productos obtenidos:', this.products, this.urgentProducts);
-  }
-
-  protected async handleToggleChange(productName: string, event: Event) {
-    const customEvent = event as CustomEvent;
-    if (customEvent.detail.checked) {
-      await this.dataService.delete(productName, true);
-    } else {
-      await this.dataService.storeData(productName);
-    }
-
-    this.fetchProducts();
   }
 
   protected async addProduct() {
@@ -69,7 +53,23 @@ export class TabUrgent implements OnInit {
               return false;
             }
 
-            this.fetchProducts();
+            const existingProducts = this.products();
+
+            if (
+              existingProducts.some(
+                (product) => product.name === data.productName
+              )
+            ) {
+              console.log('Product already exists:', data.productName);
+              return false;
+            }
+
+            this.products.update((products) => {
+              return [
+                ...products,
+                { name: data.productName.trim(), checked: false, urgent: true },
+              ];
+            });
 
             return true;
           },
@@ -91,9 +91,5 @@ export class TabUrgent implements OnInit {
     document.addEventListener('keyup', enterListener);
 
     await alert.present();
-
-    alert.onDidDismiss().then(() => {
-      document.removeEventListener('keyup', enterListener);
-    });
   }
 }

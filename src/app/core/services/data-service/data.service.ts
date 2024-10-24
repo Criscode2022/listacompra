@@ -22,7 +22,14 @@ export class DataService {
     const storage = await this.storage.create();
     this._storage = storage;
     console.log('Storage initialized');
-    this.storageInitialized.next();
+
+    const products = await this._storage.get('products');
+
+    if (!products) {
+      return;
+    }
+
+    this.products.set(products);
   }
 
   public storeData(value: any) {
@@ -53,15 +60,14 @@ export class DataService {
     return products;
   }
 
-  public async delete(key: string, urgent: boolean = false) {
-    const prefix = urgent ? 'urgent:' : 'product:';
-    await this._storage?.remove(prefix + key);
-    console.log('Product removed:', prefix + key);
+  public async delete(productName: string) {
+    this.products.update((products) => {
+      return products.filter((p) => p.name !== productName);
+    });
   }
 
-  public clearStorage() {
-    this._storage?.clear().then(() => {
-      console.log('All keys cleared');
-    });
+  public async clearStorage() {
+    await this._storage?.clear();
+    this.products.set([]);
   }
 }
