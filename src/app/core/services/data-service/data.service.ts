@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { BehaviorSubject } from 'rxjs';
+import { Product } from '../../types/product';
 
 @Injectable({
   providedIn: 'root',
@@ -8,10 +9,13 @@ import { BehaviorSubject } from 'rxjs';
 export class DataService {
   private _storage: Storage | null = null;
   public storageInitialized = new BehaviorSubject<void>(undefined);
-  public productsUpdated = new BehaviorSubject<void>(undefined);
+  public products = signal<Product[]>([]);
 
   constructor(private storage: Storage) {
     this.initStorage();
+    effect(() => {
+      this.storeData(this.products());
+    });
   }
 
   async initStorage() {
@@ -21,23 +25,9 @@ export class DataService {
     this.storageInitialized.next();
   }
 
-  public async delete(key: string, urgent: boolean = false) {
-    const prefix = urgent ? 'urgent:' : 'product:';
-    await this._storage?.remove(prefix + key);
-    this.productsUpdated.next();
-    console.log('Product removed:', prefix + key);
-  }
-
-  public set(key: string, value: any, urgent: boolean = false) {
-    const prefix = urgent ? 'urgent:' : 'product:';
-    this._storage?.set(prefix + key, value);
-    this.productsUpdated.next(value);
-    console.log('Product saved:', prefix + key, value);
-  }
-
-  public async get(key: string, urgent: boolean = false) {
-    const prefix = urgent ? 'urgent:' : 'product:';
-    return await this._storage?.get(prefix + key);
+  public storeData(value: any) {
+    this._storage?.set('products', value);
+    console.log('Product saved:', value);
   }
 
   public async getProducts(urgent = false) {
@@ -63,10 +53,15 @@ export class DataService {
     return products;
   }
 
+  public async delete(key: string, urgent: boolean = false) {
+    const prefix = urgent ? 'urgent:' : 'product:';
+    await this._storage?.remove(prefix + key);
+    console.log('Product removed:', prefix + key);
+  }
+
   public clearStorage() {
     this._storage?.clear().then(() => {
       console.log('All keys cleared');
-      this.productsUpdated.next();
     });
   }
 }

@@ -3,7 +3,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from '../../../core/services/data-service/data.service';
-import { Product } from '../../../core/types/product';
 
 @Component({
   selector: 'app-tab-pantry',
@@ -13,30 +12,19 @@ import { Product } from '../../../core/types/product';
   imports: [CommonModule, FormsModule, IonicModule],
 })
 export class TabPantry implements OnInit {
-  products = [] as Product[];
-
   private alertController = inject(AlertController);
   private dataService = inject(DataService);
 
+  protected products = this.dataService.products;
+
   ngOnInit(): void {
-    this.dataService.productsUpdated.subscribe(() => {
-      this.fetchProducts();
-    });
-
-    this.dataService.storageInitialized.subscribe(() => {
-      this.fetchProducts();
-    });
-  }
-
-  private async fetchProducts() {
-    this.products = await this.dataService.getProducts(false);
-    console.log('Productos obtenidos:', this.products);
+    this.dataService.storageInitialized.subscribe(() => {});
   }
 
   protected async handleToggleChange(productName: string, event: Event) {
     const customEvent = event as CustomEvent;
     const isChecked = customEvent.detail.checked;
-    await this.dataService.set(productName, isChecked, false);
+    await this.dataService.storeData(productName);
   }
 
   protected async addProduct() {
@@ -65,8 +53,27 @@ export class TabPantry implements OnInit {
               return false;
             }
 
-            await this.dataService.set(data.productName, true, false);
-            this.fetchProducts();
+            const existingProducts = this.products();
+            if (
+              existingProducts.some(
+                (product) => product.name === data.productName
+              )
+            ) {
+              console.log('Product already exists:', data.productName);
+              return false;
+            }
+
+            this.products.update((products) => [
+              ...products,
+              {
+                name: data.productName.trim(),
+                checked: false,
+                urgent: false,
+              },
+            ]);
+
+            console.log('Added product:', data.productName);
+            console.log('Products:', this.products());
 
             return true;
           },
@@ -74,29 +81,26 @@ export class TabPantry implements OnInit {
       ],
     });
 
-    const enterListener = (event: KeyboardEvent) => {
+    const enterListener = async (event: KeyboardEvent): Promise<boolean> => {
       if (event.key === 'Enter') {
         let addButton = document.querySelector(
           '.alert-wrapper .alert-button-group button:last-child'
         ) as HTMLElement;
         if (addButton) {
-          addButton.click();
+          await addButton.click();
+          return false;
         }
       }
+      return true;
     };
 
-    document.addEventListener('keyup', enterListener);
+    document.addEventListener('keydown', enterListener);
 
     await alert.present();
-
-    alert.onDidDismiss().then(() => {
-      document.removeEventListener('keyup', enterListener);
-    });
   }
 
   protected async deleteProduct(productName: string) {
     await this.dataService.delete(productName, false);
-    this.fetchProducts();
   }
 
   protected async clearStorage() {

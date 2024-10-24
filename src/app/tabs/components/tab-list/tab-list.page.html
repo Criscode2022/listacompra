@@ -13,13 +13,9 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <ion-item *ngFor="let product of products">
+    <ion-item *ngFor="let product of products()">
       <ion-label>{{ product.name }}</ion-label>
-      <ion-checkbox
-        slot="end"
-        [(ngModel)]="product.checked"
-        (ionChange)="handleToggleChange(product.name, $event)"
-      >
+      <ion-checkbox slot="end" (ionChange)="handleToggleChange(product.name)">
       </ion-checkbox>
     </ion-item>
   </ion-list>

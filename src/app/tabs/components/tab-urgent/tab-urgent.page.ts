@@ -3,7 +3,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from '../../../core/services/data-service/data.service';
-import { Product } from '../../../core/types/product';
 
 @Component({
   selector: 'app-tab-urgent',
@@ -16,14 +15,10 @@ export class TabUrgent implements OnInit {
   private dataService = inject(DataService);
   private alertController = inject(AlertController);
 
-  private products = [] as Product[];
-  protected urgentProducts = [] as Product[];
+  private products = [] as any[];
+  protected urgentProducts = [] as any[];
 
   ngOnInit(): void {
-    this.dataService.productsUpdated.subscribe(() => {
-      this.fetchProducts();
-    });
-
     this.dataService.storageInitialized.subscribe(() => {
       this.fetchProducts();
     });
@@ -40,7 +35,7 @@ export class TabUrgent implements OnInit {
     if (customEvent.detail.checked) {
       await this.dataService.delete(productName, true);
     } else {
-      await this.dataService.set(productName, customEvent.detail.checked, true);
+      await this.dataService.storeData(productName);
     }
 
     this.fetchProducts();
@@ -74,7 +69,6 @@ export class TabUrgent implements OnInit {
               return false;
             }
 
-            await this.dataService.set(data.productName, false, true);
             this.fetchProducts();
 
             return true;
