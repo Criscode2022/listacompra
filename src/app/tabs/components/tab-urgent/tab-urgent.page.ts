@@ -1,14 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
-import { Product } from '../core/types/product';
-import { DataService } from '../data.service';
+import { FormsModule } from '@angular/forms';
+import { AlertController, IonicModule } from '@ionic/angular';
+import { DataService } from '../../../core/services/data-service/data.service';
+import { Product } from '../../../core/types/product';
 
 @Component({
-  selector: 'app-tab3',
-  templateUrl: 'tab3.page.html',
-  styleUrls: ['tab3.page.scss'],
+  selector: 'app-tab-urgent',
+  templateUrl: 'tab-urgent.page.html',
+  styleUrls: ['tab-urgent.page.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule],
 })
-export class Tab3Page implements OnInit {
+export class TabUrgent implements OnInit {
   private dataService = inject(DataService);
   private alertController = inject(AlertController);
 

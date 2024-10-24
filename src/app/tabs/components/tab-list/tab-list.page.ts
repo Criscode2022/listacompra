@@ -1,12 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { Product } from '../core/types/product';
-import { DataService } from '../data.service';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import { DataService } from 'src/app/core/services/data-service/data.service';
+import { Product } from 'src/app/core/types/product';
+
 @Component({
-  selector: 'app-tab2-lista',
-  templateUrl: 'tab2-lista.page.html',
-  styleUrls: ['tab2-lista.page.scss'],
+  selector: 'app-tab-list',
+  templateUrl: 'tab-list.page.html',
+  styleUrls: ['tab-list.page.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule],
 })
-export class Tab2Page {
+export class TabList {
   products = [] as Product[];
 
   private dataService = inject(DataService);

@@ -1,14 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
-import { Product } from '../core/types/product';
-import { DataService } from '../data.service';
+import { FormsModule } from '@angular/forms';
+import { AlertController, IonicModule } from '@ionic/angular';
+import { DataService } from '../../../core/services/data-service/data.service';
+import { Product } from '../../../core/types/product';
 
 @Component({
-  selector: 'app-tab1-despensa',
-  templateUrl: 'tab1-despensa.page.html',
-  styleUrls: ['tab1-despensa.page.scss'],
+  selector: 'app-tab-pantry',
+  templateUrl: 'tab-pantry.page.html',
+  styleUrls: ['tab-pantry.page.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule],
 })
-export class Tab1Page implements OnInit {
+export class TabPantry implements OnInit {
   products = [] as Product[];
 
   private alertController = inject(AlertController);
