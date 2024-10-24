@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { DataService } from '../data.service';
+import { Component, inject, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { Product } from '../core/types/product';
+import { DataService } from '../data.service';
 
 @Component({
   selector: 'app-tab3',
@@ -8,41 +9,40 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['tab3.page.scss'],
 })
 export class Tab3Page implements OnInit {
-  products: { name: string; checked: boolean }[] = [];
-  urgentProducts: { name: string; checked: boolean }[] = []; // Añadimos la variable urgentProducts
+  private dataService = inject(DataService);
+  private alertController = inject(AlertController);
 
-  constructor(
-    private dataService: DataService,
-    private alertController: AlertController
-  ) {}
+  private products = [] as Product[];
+  protected urgentProducts = [] as Product[];
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.dataService.productsUpdated.subscribe(() => {
       this.fetchProducts();
     });
+
     this.dataService.storageInitialized.subscribe(() => {
       this.fetchProducts();
     });
   }
 
-  async fetchProducts() {
-    this.products = await this.dataService.getProducts(false); // Aquí, pasamos false para obtener los productos no urgentes
-    this.urgentProducts = await this.dataService.getProducts(true); // Rellenamos urgentProducts con los productos urgentes
-    console.log('Productos obtenidos:', this.products, this.urgentProducts); // Nueva línea de logging
+  private async fetchProducts() {
+    this.products = await this.dataService.getProducts(false);
+    this.urgentProducts = await this.dataService.getProducts(true);
+    console.log('Productos obtenidos:', this.products, this.urgentProducts);
   }
 
-  async handleToggleChange(productName: string, event: Event) {
+  protected async handleToggleChange(productName: string, event: Event) {
     const customEvent = event as CustomEvent;
     if (customEvent.detail.checked) {
-      await this.dataService.remove(productName, true); // Aquí, pasamos true para indicar que estamos eliminando un producto urgente
+      await this.dataService.delete(productName, true);
     } else {
-      await this.dataService.set(productName, customEvent.detail.checked, true); // Aquí, pasamos true para indicar que estamos desmarcando un producto urgente
+      await this.dataService.set(productName, customEvent.detail.checked, true);
     }
-    // Refresca la lista
+
     this.fetchProducts();
   }
 
-  async addProduct() {
+  protected async addProduct() {
     const alert = await this.alertController.create({
       header: 'Nuevo producto urgente',
       inputs: [
@@ -61,46 +61,41 @@ export class Tab3Page implements OnInit {
           text: 'Añadir',
           handler: async (data) => {
             if (!data.productName.trim()) {
-              // El producto está en blanco
               console.log('El producto está en blanco.');
               return false;
             }
 
             if (data.productName.trim().length > 30) {
-              // El producto excede los 30 caracteres
               console.log('El producto excede los 30 caracteres.');
               return false;
             }
 
-            await this.dataService.set(data.productName, false, true); // Aquí, pasamos true para indicar que estamos añadiendo un producto urgente
+            await this.dataService.set(data.productName, false, true);
             this.fetchProducts();
 
-            return true; // Indica que la adición del producto fue exitosa
+            return true;
           },
         },
       ],
     });
 
-
-
-  //Event listener para añadir productos pulsando la tecla "Enter"
-  const enterListener = (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      let addButton = document.querySelector('.alert-wrapper .alert-button-group button:last-child') as HTMLElement;
-      if (addButton) {
-        addButton.click();
+    const enterListener = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        let addButton = document.querySelector(
+          '.alert-wrapper .alert-button-group button:last-child'
+        ) as HTMLElement;
+        if (addButton) {
+          addButton.click();
+        }
       }
-    }
-  };
+    };
 
-  document.addEventListener('keyup', enterListener);
+    document.addEventListener('keyup', enterListener);
 
-  await alert.present();
+    await alert.present();
 
-  alert.onDidDismiss().then(() => {
-    document.removeEventListener('keyup', enterListener);
-  });
-}
-
-
+    alert.onDidDismiss().then(() => {
+      document.removeEventListener('keyup', enterListener);
+    });
+  }
 }

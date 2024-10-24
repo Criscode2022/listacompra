@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Product } from '../core/types/product';
 import { DataService } from '../data.service';
 @Component({
   selector: 'app-tab2-lista',
@@ -6,19 +7,11 @@ import { DataService } from '../data.service';
   styleUrls: ['tab2-lista.page.scss'],
 })
 export class Tab2Page {
-  products: { name: string; checked: boolean }[] = [];
+  products = [] as Product[];
 
-  constructor(private dataService: DataService) {}
+  private dataService = inject(DataService);
 
   ionViewWillEnter() {
-    this.refreshProducts();
-  }
-
-  async handleToggleChange(productName: string, event: Event) {
-    const customEvent = event as CustomEvent;
-    await this.dataService.set(productName, customEvent.detail.checked);
-
-    // Refresca la lista
     this.refreshProducts();
   }
 
@@ -26,6 +19,12 @@ export class Tab2Page {
     this.products = (await this.dataService.getProducts()).filter(
       (product) => !product.checked
     );
-    console.log('Initialized with products: ', this.products);
+  }
+
+  protected async handleToggleChange(productName: string, event: Event) {
+    const customEvent = event as CustomEvent;
+    await this.dataService.set(productName, customEvent.detail.checked);
+
+    this.refreshProducts();
   }
 }
