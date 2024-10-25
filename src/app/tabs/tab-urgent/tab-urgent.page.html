@@ -1,7 +1,9 @@
 <app-header title="Urgente" icon="alert" color="danger"></app-header>
 
 <ion-content>
-  <ng-container *ngIf="hasUrgentProducts(products());else empty">
+  <ng-container
+    *ngIf="hasProductsByCondition(this.products(), 'urgent'); else empty"
+  >
     <ion-list>
       <ng-container *ngFor="let product of products()">
         <ng-container *ngIf="product.urgent">

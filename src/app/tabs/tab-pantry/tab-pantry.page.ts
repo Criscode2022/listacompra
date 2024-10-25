@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
-import { Product } from 'src/app/core/types/product';
-import { HeaderComponent } from '../layout/header/header/header.component';
+import { hasProductsByCondition } from 'src/app/shared/utils/filterProducts';
+import { HeaderComponent } from '../../layout/header/header/header.component';
 
 @Component({
   selector: 'app-tab-pantry',
@@ -13,27 +13,13 @@ import { HeaderComponent } from '../layout/header/header/header.component';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
 })
-export class TabPantry implements OnInit {
+export class TabPantry {
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);
 
   protected products = this.dataService.products;
 
-  protected hasPantryProducts = (products: Product[]): boolean => {
-    return products.some((product: any) => !product.urgent);
-  };
-
-  constructor() {
-    effect(() => {
-      if (this.products().length) {
-        this.hasPantryProducts(this.products());
-      }
-    });
-  }
-
-  ngOnInit(): void {
-    this.dataService.storageInitialized.subscribe(() => {});
-  }
+  protected hasProductsByCondition = hasProductsByCondition;
 
   protected async handleToggleChange(productName: string) {
     this.products.update((products) => {

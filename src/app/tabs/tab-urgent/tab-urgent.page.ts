@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
-import { Product } from 'src/app/core/types/product';
-import { HeaderComponent } from '../layout/header/header/header.component';
+import { hasProductsByCondition } from 'src/app/shared/utils/filterProducts';
+import { HeaderComponent } from '../../layout/header/header/header.component';
 
 @Component({
   selector: 'app-tab-urgent',
@@ -19,17 +19,7 @@ export class TabUrgent {
 
   protected products = this.dataService.products;
 
-  constructor() {
-    effect(() => {
-      if (this.products().length) {
-        this.hasUrgentProducts(this.products());
-      }
-    });
-  }
-
-  protected hasUrgentProducts = (products: Product[]): boolean => {
-    return products.some((product) => product.urgent);
-  };
+  protected hasProductsByCondition = hasProductsByCondition;
 
   protected async handleToggleChange(productName: string) {
     this.products.update((products) => {

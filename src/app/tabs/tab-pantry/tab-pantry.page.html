@@ -2,7 +2,7 @@
 
 <ion-content [fullscreen]="true">
   <ng-container
-    *ngIf="hasPantryProducts(this.products());else empty"
+    *ngIf="hasProductsByCondition(this.products(), 'pantry');else empty"
   ></ng-container>
   <ion-grid>
     <ion-row>

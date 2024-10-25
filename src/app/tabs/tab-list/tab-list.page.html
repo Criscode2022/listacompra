@@ -1,7 +1,9 @@
 <app-header title="Lista" icon="reader"></app-header>
 
 <ion-content>
-  <ng-container *ngIf="hasPendingProducts(this.products()); else empty">
+  <ng-container
+    *ngIf="hasProductsByCondition(this.products(), 'pending'); else empty"
+  >
     <ion-list>
       <ng-container *ngFor="let product of products()">
         <ng-container *ngIf="!product.checked">
