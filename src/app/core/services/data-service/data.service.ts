@@ -21,7 +21,6 @@ export class DataService {
   async initStorage() {
     const storage = await this.storage.create();
     this._storage = storage;
-    console.log('Storage initialized');
 
     const products = await this._storage.get('products');
 
@@ -34,30 +33,6 @@ export class DataService {
 
   public storeData(value: any) {
     this._storage?.set('products', value);
-    console.log('Product saved:', value);
-  }
-
-  public async getProducts(urgent = false) {
-    if (!this._storage) {
-      console.log('Storage not initialized');
-      return [];
-    }
-
-    const prefix = urgent ? 'urgent:' : 'product:';
-    const keys = await this._storage.keys();
-    const filteredKeys = keys.filter((k) => k.startsWith(prefix));
-
-    console.log('Storage keys:', filteredKeys);
-
-    const products = [];
-
-    for (let key of filteredKeys) {
-      let productChecked = await this._storage.get(key);
-      let product = { name: key.replace(prefix, ''), checked: productChecked };
-      products.push(product);
-    }
-
-    return products;
   }
 
   public async toggleStatus(productName: string) {

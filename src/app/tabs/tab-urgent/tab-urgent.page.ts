@@ -3,8 +3,8 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { HeaderComponent } from 'src/app/layout/header/header.component';
 import { hasProductsByCondition } from 'src/app/shared/utils/filterProducts';
-import { HeaderComponent } from '../../layout/header/header/header.component';
 
 @Component({
   selector: 'app-tab-urgent',
