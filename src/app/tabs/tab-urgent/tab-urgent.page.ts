@@ -68,7 +68,12 @@ export class TabUrgent {
             this.products.update((products) => {
               return [
                 ...products,
-                { name: data.productName.trim(), checked: false, urgent: true },
+                {
+                  name: data.productName.trim(),
+                  checked: false,
+                  quantity: 1,
+                  urgent: true,
+                },
               ];
             });
 

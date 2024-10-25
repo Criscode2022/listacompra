@@ -12,13 +12,27 @@
             <ng-container *ngIf="!product.urgent">
               <ion-item-sliding>
                 <ion-item>
-                  <ion-toggle
-                    slot="end"
-                    [checked]="product.checked"
-                    (ionChange)="handleToggleChange(product.name)"
+                  <div
+                    class="custom-item"
+                    (click)="handleToggleChange(product.name)"
                   >
-                    <span>{{product.name}}</span>
-                  </ion-toggle>
+                    <div>
+                      <span class="name">{{product.name}}</span>
+                      <span
+                        class="quantity"
+                        (click)="addQuantity(product.name)"
+                        StopPropagation
+                        >x{{product.quantity}}</span
+                      >
+                    </div>
+                    <ion-toggle
+                      slot="end"
+                      [checked]="product.checked"
+                      (ionChange)="handleToggleChange(product.name)"
+                      StopPropagation
+                    >
+                    </ion-toggle>
+                  </div>
                 </ion-item>
                 <ion-item-options side="end">
                   <ion-item-option

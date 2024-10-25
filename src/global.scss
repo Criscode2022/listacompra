@@ -25,17 +25,10 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-ion-toggle {
-  position: relative;
-  left: 10px;
-}
-
-ion-toggle:hover  {
-  background-color: rgba(173, 216, 230, 0.242);
-}
 
 .empty {
   margin: 20px;
   text-align: center;
   font-weight: bold;
 }
+

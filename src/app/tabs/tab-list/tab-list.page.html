@@ -9,6 +9,7 @@
         <ng-container *ngIf="!product.checked">
           <ion-item>
             <ion-label>{{ product.name }}</ion-label>
+            <span class="quantity">x{{product.quantity}}</span>
             <ion-checkbox
               slot="end"
               (ionChange)="handleToggleChange(product.name)"

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { hasProductsByCondition } from 'src/app/shared/utils/filterProducts';
+import { StopPropagationDirective } from '../../core/directives/stop-propagation/stop-propagation.directive';
 import { HeaderComponent } from '../../layout/header/header/header.component';
 
 @Component({
@@ -11,7 +12,13 @@ import { HeaderComponent } from '../../layout/header/header/header.component';
   templateUrl: 'tab-pantry.page.html',
   styleUrls: ['tab-pantry.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    HeaderComponent,
+    StopPropagationDirective,
+  ],
 })
 export class TabPantry {
   private alertController = inject(AlertController);
@@ -26,6 +33,10 @@ export class TabPantry {
       return products.map((p) => {
         if (p.name === productName) {
           p.checked = !p.checked;
+
+          if (p.checked) {
+            p.quantity = 1;
+          }
         }
         return p;
       });
@@ -74,6 +85,7 @@ export class TabPantry {
               {
                 name: data.productName.trim(),
                 checked: false,
+                quantity: 1,
                 urgent: false,
               },
             ]);
@@ -103,5 +115,17 @@ export class TabPantry {
     document.addEventListener('keydown', enterListener);
 
     await alert.present();
+  }
+
+  protected addQuantity(productName: string) {
+    this.products.update((products) => {
+      return products.map((p) => {
+        if (p.name === productName) {
+          p.quantity++;
+          p.checked = false;
+        }
+        return p;
+      });
+    });
   }
 }

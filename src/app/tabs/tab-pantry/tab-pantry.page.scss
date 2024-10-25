@@ -1,20 +1,30 @@
-ion-toggle {
-
-  width: 100%;
-  position: relative;
-  left: 10px;
-
-
+.name {
+  margin:0 10px 0 10px;
 }
 
-¡
+.quantity {
+font-weight: bold;
+ padding: 10px;
+ margin: 10px;
+ background-color: rgba(112, 128, 144, 0.212);
+ border-radius: 10px;
+ border: 1px solid rgba(0, 0, 0, 0.24);
+}
 
-ion-item {
+.quantity:hover {
+ background-color: rgba(112, 128, 144, 0.342);
+}
 
-  width: 100%;
-  height: 100%;
-  border-radius: 0px;
-  border: 0px;
-  padding: 0px;
-  margin: 0px;
+
+.custom-item:hover {
+  background-color: rgba(112, 128, 144, 0.212) !important;
+}
+
+.custom-item {
+width: 100% !important;
+height: 100%;
+align-items: center;
+
+display: flex;
+justify-content: space-between;
 }
