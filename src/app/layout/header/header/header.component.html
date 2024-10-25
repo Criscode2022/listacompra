@@ -8,5 +8,14 @@
       size="large "
     ></ion-icon>
     <ion-title>{{ title }}</ion-title>
+    <ion-button
+      [class.visible]="buttonVisible"
+      slot="end"
+      class="ion-margin"
+      color="danger"
+      (click)="clearStorage()"
+    >
+      <ion-icon slot="icon-only" name="trash"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>

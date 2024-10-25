@@ -104,26 +104,4 @@ export class TabPantry {
 
     await alert.present();
   }
-
-  protected async clearStorage() {
-    const alert = await this.alertController.create({
-      header: 'Confirmar borrado',
-      message:
-        '¿Seguro que quieres borrar todos los productos? Si solo quieres eliminar un producto puedes deslizarlo hacia la izquierda',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Borrar',
-          handler: () => {
-            this.dataService.clearStorage();
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
 }
