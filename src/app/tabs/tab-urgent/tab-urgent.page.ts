@@ -1,21 +1,35 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { Product } from 'src/app/core/types/product';
+import { HeaderComponent } from '../layout/header/header/header.component';
 
 @Component({
   selector: 'app-tab-urgent',
   templateUrl: 'tab-urgent.page.html',
   styleUrls: ['tab-urgent.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
 })
 export class TabUrgent {
   private alertController = inject(AlertController);
   private dataService = inject(DataService);
 
   protected products = this.dataService.products;
+
+  constructor() {
+    effect(() => {
+      if (this.products().length) {
+        this.hasUrgentProducts(this.products());
+      }
+    });
+  }
+
+  protected hasUrgentProducts = (products: Product[]): boolean => {
+    return products.some((product) => product.urgent);
+  };
 
   protected async handleToggleChange(productName: string) {
     this.products.update((products) => {
@@ -44,12 +58,10 @@ export class TabUrgent {
           text: 'Añadir',
           handler: async (data) => {
             if (!data.productName.trim()) {
-              console.log('El producto está en blanco.');
               return false;
             }
 
             if (data.productName.trim().length > 30) {
-              console.log('El producto excede los 30 caracteres.');
               return false;
             }
 
@@ -60,7 +72,6 @@ export class TabUrgent {
                 (product) => product.name === data.productName
               )
             ) {
-              console.log('Product already exists:', data.productName);
               return false;
             }
 

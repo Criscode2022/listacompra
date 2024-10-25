@@ -3,22 +3,24 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { Product } from 'src/app/core/types/product';
+import { HeaderComponent } from '../layout/header/header/header.component';
 
 @Component({
   selector: 'app-tab-list',
   templateUrl: 'tab-list.page.html',
   styleUrls: ['tab-list.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
 })
 export class TabList {
   private dataService = inject(DataService);
 
-  products = this.dataService.products;
+  protected products = this.dataService.products;
 
-  ionViewWillEnter() {
-    console.log('ionViewWillEnter');
-  }
+  protected hasPendingProducts = (products: Product[]): boolean => {
+    return products.some((product) => !product.checked && !product.urgent);
+  };
 
   protected async handleToggleChange(productName: string) {
     this.products.update((products) => {

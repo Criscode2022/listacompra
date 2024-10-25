@@ -1,35 +1,33 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="danger">
-    <ion-icon
-      slot="start"
-      class="ion-margin"
-      class="ion-padding"
-      name="alert-circle"
-      size="large"
-    ></ion-icon>
-    <ion-title> Urgente </ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Urgente" icon="alert" color="danger"></app-header>
 
 <ion-content>
-  <ion-list>
-    <ng-container *ngFor="let product of products()">
-      <ng-container *ngIf="product.urgent">
-        <ion-item>
-          <ion-label>{{ product.name }}</ion-label>
-          <ion-checkbox
-            slot="end"
-            [(ngModel)]="product.checked"
-            (ionChange)="handleToggleChange(product.name)"
-          >
-          </ion-checkbox>
-        </ion-item>
+  <ng-container *ngIf="hasUrgentProducts(products());else empty">
+    <ion-list>
+      <ng-container *ngFor="let product of products()">
+        <ng-container *ngIf="product.urgent">
+          <ion-item>
+            <ion-label>{{ product.name }}</ion-label>
+            <ion-checkbox
+              slot="end"
+              [(ngModel)]="product.checked"
+              (ionChange)="handleToggleChange(product.name)"
+            >
+            </ion-checkbox>
+          </ion-item>
+        </ng-container>
       </ng-container>
-    </ng-container>
-  </ion-list>
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="danger" (click)="addProduct()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+    </ion-list>
+  </ng-container>
 </ion-content>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button color="danger" (click)="addProduct()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ng-template #empty>
+  <div class="empty">
+    No hay productos urgentes. Añade aquí lo que necesites comprar solo una vez.
+  </div>
+</ng-template>
