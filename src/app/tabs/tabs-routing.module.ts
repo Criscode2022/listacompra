@@ -10,7 +10,7 @@ const routes: Routes = [
     path: '',
     component: TabsPage,
     children: [
-      { path: '', redirectTo: 'despensa', pathMatch: 'full' },
+      { path: '', redirectTo: 'lista', pathMatch: 'full' },
       { path: 'despensa', component: TabPantry },
       { path: 'lista', component: TabList },
       { path: 'urgente', component: TabUrgent },
@@ -18,7 +18,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/despensa',
+    redirectTo: '/lista',
   },
 ];
 
