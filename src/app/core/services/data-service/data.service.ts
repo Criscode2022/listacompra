@@ -60,6 +60,21 @@ export class DataService {
     return products;
   }
 
+  public async toggleStatus(productName: string) {
+    this.products.update((products) => {
+      return products.map((p) => {
+        if (p.name === productName) {
+          p.checked = !p.checked;
+
+          if (p.checked) {
+            p.quantity = 1;
+          }
+        }
+        return p;
+      });
+    });
+  }
+
   public async delete(productName: string) {
     this.products.update((products) => {
       return products.filter((p) => p.name !== productName);

@@ -13,7 +13,7 @@ export class HeaderComponent {
   @Input() title = '';
   @Input() icon = '';
   @Input() color = 'primary';
-  @Input() buttonVisible = false;
+  @Input() buttonInvisible = true;
 
   private alertController = inject(AlertController);
   private dataService = inject(DataService);

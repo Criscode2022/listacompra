@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 import { TabPantry } from './tab-pantry.page';
 
-describe('Tab1Page', () => {
+describe('TabPantry', () => {
   let component: TabPantry;
   let fixture: ComponentFixture<TabPantry>;
 

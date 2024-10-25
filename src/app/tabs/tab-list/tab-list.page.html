@@ -12,7 +12,7 @@
             <span class="quantity">x{{product.quantity}}</span>
             <ion-checkbox
               slot="end"
-              (ionChange)="handleToggleChange(product.name)"
+              (ionChange)="dataService.toggleStatus(product.name)"
             >
             </ion-checkbox>
           </ion-item>

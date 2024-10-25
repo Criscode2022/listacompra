@@ -1,4 +1,4 @@
-<app-header title="Despensa" icon="home" [buttonVisible]="true"></app-header>
+<app-header title="Despensa" icon="home" [buttonInvisible]="false"></app-header>
 
 <ion-content [fullscreen]="true">
   <ng-container
@@ -14,11 +14,12 @@
                 <ion-item>
                   <div
                     class="custom-item"
-                    (click)="handleToggleChange(product.name)"
+                    (click)="dataService.toggleStatus(product.name)"
                   >
                     <div>
-                      <span class="name">{{product.name}}</span>
+                      <span>{{product.name}}</span>
                       <span
+                        [class.invisible]="product.checked"
                         class="quantity"
                         (click)="addQuantity(product.name)"
                         StopPropagation
@@ -28,7 +29,7 @@
                     <ion-toggle
                       slot="end"
                       [checked]="product.checked"
-                      (ionChange)="handleToggleChange(product.name)"
+                      (ionChange)="dataService.toggleStatus(product.name)"
                       StopPropagation
                     >
                     </ion-toggle>

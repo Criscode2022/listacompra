@@ -28,21 +28,6 @@ export class TabPantry {
 
   protected hasProductsByCondition = hasProductsByCondition;
 
-  protected async handleToggleChange(productName: string) {
-    this.products.update((products) => {
-      return products.map((p) => {
-        if (p.name === productName) {
-          p.checked = !p.checked;
-
-          if (p.checked) {
-            p.quantity = 1;
-          }
-        }
-        return p;
-      });
-    });
-  }
-
   protected async addProduct() {
     const alert = await this.alertController.create({
       header: 'Nuevo producto',

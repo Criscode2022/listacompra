@@ -14,20 +14,9 @@ import { HeaderComponent } from '../../layout/header/header/header.component';
   imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
 })
 export class TabList {
-  private dataService = inject(DataService);
+  protected dataService = inject(DataService);
 
   protected products = this.dataService.products;
 
   protected hasProductsByCondition = hasProductsByCondition;
-
-  protected async handleToggleChange(productName: string) {
-    this.products.update((products) => {
-      return products.map((p) => {
-        if (p.name === productName) {
-          p.checked = !p.checked;
-        }
-        return p;
-      });
-    });
-  }
 }

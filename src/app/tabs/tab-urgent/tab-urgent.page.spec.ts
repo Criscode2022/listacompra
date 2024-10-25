@@ -1,21 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
+import { TabUrgent } from './tab-urgent.page';
 
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
-
-import { Tab3Page } from './tab3.page';
-
-describe('Tab3Page', () => {
-  let component: Tab3Page;
-  let fixture: ComponentFixture<Tab3Page>;
+describe('TabUrgent', () => {
+  let component: TabUrgent;
+  let fixture: ComponentFixture<TabUrgent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [Tab3Page],
-      imports: [IonicModule.forRoot(), ExploreContainerComponentModule]
+      declarations: [TabUrgent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Tab3Page);
+    fixture = TestBed.createComponent(TabUrgent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
