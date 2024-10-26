@@ -1,10 +1,10 @@
 <app-header title="Despensa" icon="home" [buttonInvisible]="false"></app-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
   <ng-container
     *ngIf="hasProductsByCondition(this.products(), 'pantry');else empty"
   ></ng-container>
-  <ion-grid>
+  <ion-grid class="p-0">
     <ion-row>
       <ion-col size="12" size-md="6">
         <ion-list>
@@ -13,14 +13,14 @@
               <ion-item-sliding>
                 <ion-item>
                   <div
-                    class="custom-item"
+                    class="flex justify-between items-center w-full h-full hover:bg-gray-100 cursor-pointer"
                     (click)="dataService.toggleStatus(product.name)"
                   >
                     <div>
                       <span>{{product.name}}</span>
                       <span
                         [class.invisible]="product.checked"
-                        class="quantity"
+                        class="font-bold m-2 px-3 py-2 rounded-xl bg-gray-200 border hover:bg-gray-400 cursor-pointer"
                         (click)="addQuantity(product.name)"
                         StopPropagation
                         >x{{product.quantity}}</span

@@ -9,7 +9,7 @@
         <ng-container *ngIf="!product.checked">
           <ion-item>
             <ion-label>{{ product.name }}</ion-label>
-            <span class="quantity">x{{product.quantity}}</span>
+            <span class="font-bold mr-2">x{{product.quantity}}</span>
             <ion-checkbox
               slot="end"
               (ionChange)="dataService.toggleStatus(product.name)"
@@ -24,7 +24,7 @@
 
 <ng-template #empty>
   <div class="empty">
-    No hay productos en tu lista de la compra. Añade o marca cómo agotado en la
-    despensa lo que necesites comprar.
+    No hay productos en tu lista de la compra. Añade desde la despensa lo que
+    necesites comprar.
   </div>
 </ng-template>
