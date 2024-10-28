@@ -33,6 +33,7 @@
     "ionic-app-base": "file:",
     "ionicons": "^7.1.2",
     "rxjs": "~7.8.0",
+    "tailwindcss-animated": "^1.1.2",
     "tslib": "^2.6.1",
     "zone.js": "^0.14.10"
   },

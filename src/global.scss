@@ -29,6 +29,7 @@
   margin: 20px;
   text-align: center;
   font-weight: bold;
+  @apply animate-fade;
 }
 
 .invisible {

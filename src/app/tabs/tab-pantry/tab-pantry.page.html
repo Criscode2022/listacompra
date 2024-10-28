@@ -20,7 +20,7 @@
                       <span>{{product.name}}</span>
                       <span
                         [class.invisible]="product.checked"
-                        class="font-bold m-2 px-3 py-2 rounded-xl bg-gray-200 border hover:bg-gray-400 cursor-pointer"
+                        class="font-bold m-2 px-3 py-2 rounded-xl bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer"
                         (click)="addQuantity(product.name)"
                         StopPropagation
                         >x{{product.quantity}}</span
