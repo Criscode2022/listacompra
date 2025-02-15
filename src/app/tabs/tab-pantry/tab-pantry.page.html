@@ -16,23 +16,25 @@
                     class="flex justify-between items-center w-full h-full hover:bg-gray-100 cursor-pointer"
                     (click)="dataService.toggleStatus(product.name)"
                   >
-                    <div>
-                      <span>{{product.name}}</span>
+                    <span class="truncate">{{product.name}}</span>
+
+                    <div class="flex flex-nowrap items-center gap-2">
                       <span
                         [class.invisible]="product.checked"
-                        class="font-bold m-2 px-3 py-2 rounded-xl bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer"
+                        class="min-w-14 text-center font-bold bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer rounded-xl m-2 py-2"
                         (click)="addQuantity(product.name)"
                         StopPropagation
                         >x{{product.quantity}}</span
                       >
+
+                      <ion-toggle
+                        slot="end"
+                        [checked]="product.checked"
+                        (ionChange)="dataService.toggleStatus(product.name)"
+                        StopPropagation
+                      >
+                      </ion-toggle>
                     </div>
-                    <ion-toggle
-                      slot="end"
-                      [checked]="product.checked"
-                      (ionChange)="dataService.toggleStatus(product.name)"
-                      StopPropagation
-                    >
-                    </ion-toggle>
                   </div>
                 </ion-item>
                 <ion-item-options side="end">

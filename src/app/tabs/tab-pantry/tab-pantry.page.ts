@@ -36,6 +36,10 @@ export class TabPantry {
           name: 'productName',
           type: 'text',
           placeholder: 'Nombre del producto',
+          attributes: {
+            maxlength: 30,
+            required: true,
+          },
         },
       ],
       buttons: [
