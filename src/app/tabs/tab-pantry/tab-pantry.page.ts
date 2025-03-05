@@ -36,7 +36,7 @@ export class TabPantry {
         {
           name: 'productName',
           type: 'text',
-          placeholder: 'Nombre del producto',
+          placeholder: 'Nombre',
           attributes: {
             maxlength: 30,
             required: true,
