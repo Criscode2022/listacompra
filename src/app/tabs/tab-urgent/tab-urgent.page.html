@@ -1,22 +1,18 @@
 <app-header title="Urgente" icon="alert" color="danger"></app-header>
 
 <ion-content>
-  <ng-container
-    *ngIf="hasProductsByCondition(this.products(), 'urgent'); else empty"
-  >
+  <ng-container *ngIf="urgentProducts.length; else empty">
     <ion-list>
       <ng-container *ngFor="let product of products()">
-        <ng-container *ngIf="product.urgent">
-          <ion-item>
-            <ion-label>{{ product.name }}</ion-label>
-            <ion-checkbox
-              slot="end"
-              [(ngModel)]="product.checked"
-              (ionChange)="handleToggleChange(product.name)"
-            >
-            </ion-checkbox>
-          </ion-item>
-        </ng-container>
+        <ion-item>
+          <ion-label>{{ product.name }}</ion-label>
+          <ion-checkbox
+            slot="end"
+            [(ngModel)]="product.checked"
+            (ionChange)="handleToggleChange(product.name)"
+          >
+          </ion-checkbox>
+        </ion-item>
       </ng-container>
     </ion-list>
   </ng-container>

@@ -1,12 +1,10 @@
 <app-header title="Lista de la compra" icon="reader"></app-header>
 
 <ion-content>
-  <ng-container
-    *ngIf="hasProductsByCondition(this.products(), 'pending'); else empty"
-  >
+  <ng-container *ngIf="pendingProducts().length; else empty">
     <ion-list>
-      <ng-container *ngFor="let product of products()">
-        <ng-container *ngIf="!product.checked && !product.urgent">
+      <ng-container *ngFor="let product of pendingProducts()">
+        <ng-container *ngIf="!product.checked">
           <ion-item>
             <ion-label>{{ product.name }}</ion-label>
             <span class="font-bold mr-2">x{{product.quantity}}</span>

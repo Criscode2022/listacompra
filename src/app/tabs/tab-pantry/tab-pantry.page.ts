@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
-import { hasProductsByCondition } from 'src/app/shared/utils/filterProducts';
 import { StopPropagationDirective } from '../../core/directives/stop-propagation/stop-propagation.directive';
 
 @Component({
@@ -26,7 +25,9 @@ export class TabPantry {
 
   protected products = this.dataService.products;
 
-  protected hasProductsByCondition = hasProductsByCondition;
+  protected pantryProducts = computed(() => {
+    return this.products().filter((product) => !product.urgent);
+  });
 
   protected async addProduct() {
     const alert = await this.alertController.create({
