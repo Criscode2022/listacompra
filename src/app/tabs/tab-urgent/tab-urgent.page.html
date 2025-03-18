@@ -1,9 +1,9 @@
 <app-header title="Urgente" icon="alert" color="danger"></app-header>
 
 <ion-content>
-  <ng-container *ngIf="urgentProducts.length; else empty">
+  <ng-container *ngIf="urgentProducts().length; else empty">
     <ion-list>
-      <ng-container *ngFor="let product of products()">
+      <ng-container *ngFor="let product of urgentProducts()">
         <ion-item>
           <ion-label>{{ product.name }}</ion-label>
           <ion-checkbox
