@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
@@ -15,6 +16,7 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
 export class TabUrgent {
   private alertController = inject(AlertController);
   private dataService = inject(DataService);
+  private snackbar = inject(MatSnackBar);
 
   protected products = this.dataService.products;
 
@@ -67,6 +69,10 @@ export class TabUrgent {
                 (product) => product.name === data.productName
               )
             ) {
+              this.snackbar.open(`Producto ya existente`, 'Cerrar', {
+                duration: 3000,
+              });
+
               return false;
             }
 
@@ -80,6 +86,11 @@ export class TabUrgent {
                   urgent: true,
                 },
               ];
+            });
+            ('');
+
+            this.snackbar.open(`Producto añadido correctamente`, 'Cerrar', {
+              duration: 1500,
             });
 
             return true;

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
@@ -22,6 +23,7 @@ import { StopPropagationDirective } from '../../core/directives/stop-propagation
 export class TabPantry {
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);
+  private snackbar = inject(MatSnackBar);
 
   protected products = this.dataService.products;
 
@@ -66,6 +68,10 @@ export class TabPantry {
                 (product) => product.name === data.productName
               )
             ) {
+              this.snackbar.open(`Producto ya existente`, 'Cerrar', {
+                duration: 3000,
+              });
+
               return false;
             }
 
@@ -78,6 +84,10 @@ export class TabPantry {
                 urgent: false,
               },
             ]);
+
+            this.snackbar.open(`Producto añadido correctamente`, 'Cerrar', {
+              duration: 1500,
+            });
 
             return true;
           },

@@ -1,4 +1,5 @@
 import { Component, inject, Input } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 
@@ -16,9 +17,14 @@ export class HeaderComponent {
   @Input() buttonInvisible = true;
 
   private alertController = inject(AlertController);
-  private dataService = inject(DataService);
+  protected dataService = inject(DataService);
+  private snackbar = inject(MatSnackBar);
 
   protected async clearStorage() {
+    if (!this.dataService.products().length) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Confirmar borrado',
       message:
@@ -32,6 +38,10 @@ export class HeaderComponent {
           text: 'Borrar',
           handler: () => {
             this.dataService.clearStorage();
+
+            this.snackbar.open(`Productos eliminados correctamente`, 'Cerrar', {
+              duration: 3000,
+            });
           },
         },
       ],
