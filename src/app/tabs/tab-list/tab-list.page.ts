@@ -16,6 +16,8 @@ export class TabList {
   protected dataService = inject(DataService);
 
   protected pendingProducts = computed(() => {
-    return this.dataService.products().filter((product) => !product.checked);
+    return this.dataService
+      .products()
+      .filter((product) => !product.checked && !product.urgent);
   });
 }
