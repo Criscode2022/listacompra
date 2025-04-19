@@ -31,8 +31,8 @@ export class DataService {
     this.products.set(products);
   }
 
-  public storeData(value: any) {
-    this._storage?.set('products', value);
+  public storeData(products: Product[]) {
+    this._storage?.set('products', products);
   }
 
   public async toggleStatus(productName: string) {

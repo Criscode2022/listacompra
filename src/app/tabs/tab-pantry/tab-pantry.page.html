@@ -12,7 +12,7 @@
         <ion-list>
           <ng-container *ngFor="let product of pantryProducts()">
             <ion-item-sliding>
-              <ion-item class="h-16">
+              <ion-item>
                 <div
                   class="flex justify-between items-center w-full h-full hover:bg-gray-100 cursor-pointer"
                   (click)="dataService.toggleStatus(product.name)"
