@@ -115,12 +115,12 @@ export class TabPantry {
 
   protected addQuantity(productName: string) {
     this.products.update((products) => {
-      return products.map((p) => {
-        if (p.name === productName) {
-          p.quantity++;
-          p.checked = false;
+      return products.map((product) => {
+        if (product.name === productName) {
+          product.quantity++;
+          product.checked = false;
         }
-        return p;
+        return product;
       });
     });
   }

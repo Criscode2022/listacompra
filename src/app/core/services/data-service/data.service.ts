@@ -37,22 +37,22 @@ export class DataService {
 
   public async toggleStatus(productName: string) {
     this.products.update((products) => {
-      return products.map((p) => {
-        if (p.name === productName) {
-          p.checked = !p.checked;
+      return products.map((product) => {
+        if (product.name === productName) {
+          product.checked = !product.checked;
 
-          if (p.checked) {
-            p.quantity = 1;
+          if (product.checked) {
+            product.quantity = 1;
           }
         }
-        return p;
+        return product;
       });
     });
   }
 
   public async delete(productName: string) {
     this.products.update((products) => {
-      return products.filter((p) => p.name !== productName);
+      return products.filter((product) => product.name !== productName);
     });
   }
 

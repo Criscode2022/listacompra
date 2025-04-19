@@ -1,4 +1,8 @@
-<app-header title="Despensa" icon="home" [buttonInvisible]="false"></app-header>
+<app-header
+  title="Despensa"
+  icon="home"
+  [deleteButtonInvisible]="false"
+></app-header>
 
 <ion-content>
   <ng-container *ngIf="pantryProducts().length; else empty"></ng-container>

@@ -14,7 +14,7 @@ export class HeaderComponent {
   @Input() title = '';
   @Input() icon = '';
   @Input() color = 'primary';
-  @Input() buttonInvisible = true;
+  @Input() deleteButtonInvisible = true;
 
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);
