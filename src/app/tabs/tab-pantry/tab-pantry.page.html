@@ -6,13 +6,13 @@
 
 <ion-content>
   <ng-container *ngIf="pantryProducts().length; else empty"></ng-container>
-  <ion-grid class="p-0">
+  <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="6">
         <ion-list>
           <ng-container *ngFor="let product of pantryProducts()">
             <ion-item-sliding>
-              <ion-item>
+              <ion-item class="h-16">
                 <div
                   class="flex justify-between items-center w-full h-full hover:bg-gray-100 cursor-pointer"
                   (click)="dataService.toggleStatus(product.name)"
@@ -61,7 +61,13 @@
 
 <ng-template #empty>
   <div class="empty">
-    No hay productos en tu despensa. Introduce tus productos habituales para
-    añadirlos a la lista cuando necesites comprarlos.
+    No hay productos en tu despensa. Añade
+    <span
+      class="text-blue-500 hover:text-blue-800 cursor-pointer"
+      (click)="addProduct()"
+      >aquí</span
+    >
+    tus productos habituales para añadirlos a la lista cuando necesites
+    comprarlos.
   </div>
 </ng-template>

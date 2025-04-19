@@ -2,19 +2,23 @@
 
 <ion-content>
   <ng-container *ngIf="urgentProducts().length; else empty">
-    <ion-list>
-      <ng-container *ngFor="let product of urgentProducts()">
-        <ion-item>
-          <ion-label>{{ product.name }}</ion-label>
-          <ion-checkbox
-            slot="end"
-            [(ngModel)]="product.checked"
-            (ionChange)="handleToggleChange(product.name)"
-          >
-          </ion-checkbox>
-        </ion-item>
-      </ng-container>
-    </ion-list>
+    <ion-grid>
+      <ion-list>
+        <ion-row size="12" size-md="6">
+          <ng-container *ngFor="let product of urgentProducts()">
+            <ion-item>
+              <ion-label>{{ product.name }}</ion-label>
+              <ion-checkbox
+                slot="end"
+                [(ngModel)]="product.checked"
+                (ionChange)="handleToggleChange(product.name)"
+              >
+              </ion-checkbox>
+            </ion-item>
+          </ng-container>
+        </ion-row>
+      </ion-list>
+    </ion-grid>
   </ng-container>
 </ion-content>
 
@@ -26,6 +30,12 @@
 
 <ng-template #empty>
   <div class="empty">
-    No hay productos urgentes. Añade aquí lo que necesites comprar solo una vez.
+    No hay productos urgentes. Añade
+    <span
+      class="text-red-500 hover:text-red-800 cursor-pointer"
+      (click)="addProduct()"
+      >aquí</span
+    >
+    lo que necesites comprar solo una vez.
   </div>
 </ng-template>

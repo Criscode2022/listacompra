@@ -2,27 +2,36 @@
 
 <ion-content>
   <ng-container *ngIf="pendingProducts().length; else empty">
-    <ion-list>
-      <ng-container *ngFor="let product of pendingProducts()">
-        <ng-container *ngIf="!product.checked">
-          <ion-item>
-            <ion-label>{{ product.name }}</ion-label>
-            <span class="font-bold mr-2">x{{product.quantity}}</span>
-            <ion-checkbox
-              slot="end"
-              (ionChange)="dataService.toggleStatus(product.name)"
-            >
-            </ion-checkbox>
-          </ion-item>
-        </ng-container>
-      </ng-container>
-    </ion-list>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-list>
+            <ng-container *ngFor="let product of pendingProducts()">
+              <ng-container *ngIf="!product.checked">
+                <ion-item>
+                  <ion-label>{{ product.name }}</ion-label>
+                  <span class="font-bold mr-2">x{{product.quantity}}</span>
+                  <ion-checkbox
+                    slot="end"
+                    (ionChange)="dataService.toggleStatus(product.name)"
+                  >
+                  </ion-checkbox>
+                </ion-item>
+              </ng-container>
+            </ng-container>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ng-container>
 </ion-content>
 
 <ng-template #empty>
   <div class="empty">
-    No hay productos en tu lista de la compra. Añade desde la despensa lo que
-    necesites comprar.
+    No hay productos en tu lista de la compra. Añade desde la
+    <a routerLink="/despensa" class="text-blue-500 hover:text-blue-800"
+      >despensa</a
+    >
+    lo que necesites comprar.
   </div>
 </ng-template>

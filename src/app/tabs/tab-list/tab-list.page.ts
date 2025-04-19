@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
@@ -10,7 +11,13 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
   templateUrl: 'tab-list.page.html',
   styleUrls: ['tab-list.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
+  imports: [
+    RouterModule,
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    HeaderComponent,
+  ],
 })
 export class TabList {
   protected dataService = inject(DataService);
