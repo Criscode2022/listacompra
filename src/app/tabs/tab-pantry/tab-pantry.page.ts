@@ -109,8 +109,10 @@ export class TabPantry {
     };
 
     document.addEventListener('keydown', enterListener);
-
     await alert.present();
+
+    await alert.onDidDismiss();
+    document.removeEventListener('keydown', enterListener);
   }
 
   protected addQuantity(productName: string) {
