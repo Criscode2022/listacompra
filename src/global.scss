@@ -31,3 +31,10 @@
 :root {
   --ion-tab-bar-background: transparent !important; /* Transparent for liquid glass effect */
 }
+
+/* Consistent row height across all tabs */
+ion-item {
+  --min-height: 56px;
+  --max-height: 56px;
+  height: 56px;
+}

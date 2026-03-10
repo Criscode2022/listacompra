@@ -62,14 +62,15 @@ export class TabUrgent {
               return false;
             }
 
-            const existingProducts = this.products();
+            const existingUrgent = this.urgentProducts();
+            const trimmedName = data.productName.trim();
 
             if (
-              existingProducts.some(
-                (product) => product.name === data.productName
+              existingUrgent.some(
+                (product) => product.name.toLowerCase() === trimmedName.toLowerCase()
               )
             ) {
-              this.snackbar.open(`Producto ya existente`, 'Cerrar', {
+              this.snackbar.open(`Producto urgente ya existente`, 'Cerrar', {
                 duration: 3000,
               });
 
@@ -87,7 +88,6 @@ export class TabUrgent {
                 },
               ];
             });
-            ('');
 
             this.snackbar.open(`Producto añadido correctamente`, 'Cerrar', {
               duration: 1500,
@@ -113,5 +113,7 @@ export class TabUrgent {
     document.addEventListener('keyup', enterListener);
 
     await alert.present();
+    await alert.onDidDismiss();
+    document.removeEventListener('keyup', enterListener);
   }
 }

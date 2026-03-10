@@ -1,0 +1,9 @@
+[build]
+  publish = "www"
+  command = "npm run build"
+
+# SPA redirect — send all routes to index.html for Angular routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

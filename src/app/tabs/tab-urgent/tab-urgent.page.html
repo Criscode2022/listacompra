@@ -3,21 +3,23 @@
 <ion-content>
   <ng-container *ngIf="urgentProducts().length; else empty">
     <ion-grid>
-      <ion-list>
-        <ion-row size="12" size-md="6">
-          <ng-container *ngFor="let product of urgentProducts()">
-            <ion-item>
-              <ion-label>{{ product.name }}</ion-label>
-              <ion-checkbox
-                slot="end"
-                [(ngModel)]="product.checked"
-                (ionChange)="handleToggleChange(product.name)"
-              >
-              </ion-checkbox>
-            </ion-item>
-          </ng-container>
-        </ion-row>
-      </ion-list>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-list>
+            <ng-container *ngFor="let product of urgentProducts()">
+              <ion-item>
+                <ion-label>{{ product.name }}</ion-label>
+                <ion-checkbox
+                  slot="end"
+                  [(ngModel)]="product.checked"
+                  (ionChange)="handleToggleChange(product.name)"
+                >
+                </ion-checkbox>
+              </ion-item>
+            </ng-container>
+          </ion-list>
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </ng-container>
 </ion-content>
