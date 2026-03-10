@@ -1,1 +1,236 @@
+/* ─── Liquid Glass Navbar ─── */
 
+:host {
+  ion-tab-bar.liquid-glass-bar {
+    /* Heavy frosted glass blur */
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(200, 220, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0.10) 70%,
+      rgba(240, 240, 255, 0.35) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+
+    /* Glass border with chromatic / rainbow refraction edge */
+    border: 1.5px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.70),
+      rgba(180, 200, 255, 0.40),
+      rgba(200, 180, 255, 0.35),
+      rgba(255, 200, 220, 0.30),
+      rgba(255, 255, 255, 0.60)
+    ) 1;
+    border-radius: 9999px;
+    /* border-image breaks border-radius, so we use outline + clip instead */
+    border-image: none;
+    border-color: rgba(255, 255, 255, 0.55);
+
+    /* Layered shadows for liquid depth */
+    box-shadow:
+      /* Outer diffused glow */
+      0 8px 40px rgba(100, 120, 200, 0.15),
+      0 2px 12px rgba(100, 120, 200, 0.10),
+      /* Specular top highlight — the "liquid" shine */
+      inset 0 2px 3px rgba(255, 255, 255, 0.80),
+      /* Subtle bottom refraction shadow */
+      inset 0 -2px 4px rgba(100, 120, 180, 0.08),
+      /* Side specular highlights for 3D curvature */
+      inset 2px 0 3px rgba(255, 255, 255, 0.25),
+      inset -2px 0 3px rgba(255, 255, 255, 0.25);
+
+    /* Chromatic shimmer overlay via pseudo-element */
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.30) 35%,
+        rgba(200, 220, 255, 0.20) 42%,
+        rgba(220, 200, 255, 0.15) 48%,
+        rgba(255, 210, 230, 0.10) 52%,
+        transparent 65%
+      );
+      background-size: 250% 100%;
+      animation: liquidShimmer 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Secondary specular highlight — moving light band */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -40%;
+      width: 35%;
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.35),
+        transparent
+      );
+      animation: liquidGlint 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease,
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Ionic overrides */
+    --background: transparent;
+    --border: none;
+
+    /* ─── Tab Buttons ─── */
+    ion-tab-button {
+      --color: rgba(60, 60, 67, 0.72);
+      --color-selected: #007aff;
+      --background: transparent;
+      --background-focused: rgba(255, 255, 255, 0.25);
+      --ripple-color: rgba(0, 122, 255, 0.08);
+
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  color 0.25s ease;
+
+      /* Selected tab — frosted pill indicator */
+      &.tab-selected {
+        --color: #007aff;
+
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 2px 3px;
+          border-radius: 9999px;
+          background: linear-gradient(
+            145deg,
+            rgba(0, 122, 255, 0.14) 0%,
+            rgba(0, 122, 255, 0.05) 50%,
+            rgba(100, 170, 255, 0.10) 100%
+          );
+          border: 1px solid rgba(0, 122, 255, 0.18);
+          box-shadow:
+            0 2px 10px rgba(0, 122, 255, 0.12),
+            inset 0 1px 2px rgba(255, 255, 255, 0.50);
+          z-index: -1;
+          animation: glassReveal 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      }
+
+      /* Hover state */
+      &:hover:not(.tab-selected) {
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 2px 3px;
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.30);
+          border: 1px solid rgba(255, 255, 255, 0.35);
+          z-index: -1;
+        }
+      }
+
+      &:active {
+        transform: scale(0.93);
+      }
+
+      ion-icon {
+        font-size: 22px;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      &.tab-selected ion-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 1px 3px rgba(0, 122, 255, 0.25));
+      }
+
+      ion-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+
+      /* Bigger icons & labels on md+ */
+      @media (min-width: 768px) {
+        ion-icon {
+          font-size: 26px;
+        }
+        ion-label {
+          font-size: 12px;
+        }
+      }
+    }
+
+    /* ─── Whole bar hover ─── */
+    &:hover {
+      box-shadow:
+        0 12px 48px rgba(100, 120, 200, 0.22),
+        0 4px 16px rgba(100, 120, 200, 0.12),
+        inset 0 2px 3px rgba(255, 255, 255, 0.85),
+        inset 0 -2px 4px rgba(100, 120, 180, 0.10),
+        inset 2px 0 3px rgba(255, 255, 255, 0.30),
+        inset -2px 0 3px rgba(255, 255, 255, 0.30);
+      border-color: rgba(255, 255, 255, 0.70);
+    }
+  }
+}
+
+/* ─── Animations ─── */
+
+/* Slow-moving chromatic rainbow shimmer */
+@keyframes liquidShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+/* Light glint sliding across the bar */
+@keyframes liquidGlint {
+  0% {
+    left: -40%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 110%;
+    opacity: 0;
+  }
+}
+
+/* Selected tab pill reveal */
+@keyframes glassReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
