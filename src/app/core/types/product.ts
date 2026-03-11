@@ -3,4 +3,7 @@ export interface Product {
   checked: boolean;
   quantity: number;
   urgent: boolean;
+  category?: string;
+  price?: number;
+  notes?: string;
 }

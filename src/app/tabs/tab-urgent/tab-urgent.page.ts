@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { SettingsService } from 'src/app/core/services/settings-service/settings.service';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
 
 @Component({
@@ -16,6 +17,7 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
 export class TabUrgent {
   private alertController = inject(AlertController);
   private dataService = inject(DataService);
+  protected settingsService = inject(SettingsService);
   private snackbar = inject(MatSnackBar);
 
   protected products = this.dataService.products;
@@ -33,19 +35,45 @@ export class TabUrgent {
   }
 
   protected async addProduct() {
-    const alert = await this.alertController.create({
-      header: 'Nuevo producto urgente',
-      inputs: [
+    const isAdvanced = this.settingsService.isAdvanced();
+
+    const inputs: any[] = [
+      {
+        name: 'productName',
+        type: 'text',
+        placeholder: 'Nombre',
+        attributes: {
+          maxlength: 30,
+          required: true,
+        },
+      },
+    ];
+
+    if (isAdvanced) {
+      inputs.push(
         {
-          name: 'productName',
-          type: 'text',
-          placeholder: 'Nombre',
+          name: 'productPrice',
+          type: 'number',
+          placeholder: 'Precio (€)',
+          min: 0,
           attributes: {
-            maxlength: 30,
-            required: true,
+            step: '0.01',
           },
         },
-      ],
+        {
+          name: 'productNotes',
+          type: 'text',
+          placeholder: 'Notas (opcional)',
+          attributes: {
+            maxlength: 100,
+          },
+        }
+      );
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Nuevo producto urgente',
+      inputs,
       buttons: [
         {
           text: 'Cancelar',
@@ -85,6 +113,12 @@ export class TabUrgent {
                   checked: false,
                   quantity: 1,
                   urgent: true,
+                  ...(isAdvanced && {
+                    price: data.productPrice
+                      ? parseFloat(data.productPrice)
+                      : undefined,
+                    notes: data.productNotes?.trim() || undefined,
+                  }),
                 },
               ];
             });

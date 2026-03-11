@@ -9,41 +9,99 @@
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-md="6">
-        <ion-list lines="inset">
-          <ng-container *ngFor="let product of pantryProducts()">
-            <ion-item-sliding>
-              <ion-item
-                button
-                (click)="dataService.toggleStatus(product.name)"
-                class="cursor-pointer"
-              >
-                <ion-label class="truncate">{{product.name}}</ion-label>
-                <span
-                  slot="end"
-                  [class.invisible]="product.checked"
-                  class="min-w-14 text-center font-bold bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer rounded-xl m-2 py-2"
-                  (click)="addQuantity(product.name)"
-                  StopPropagation
-                >x{{product.quantity}}</span>
-                <ion-toggle
-                  slot="end"
-                  [checked]="product.checked"
-                  (ionChange)="dataService.toggleStatus(product.name)"
-                  StopPropagation
+        <!-- Basic mode: flat list -->
+        <ng-container *ngIf="!settingsService.isAdvanced()">
+          <ion-list lines="inset">
+            <ng-container *ngFor="let product of pantryProducts()">
+              <ion-item-sliding>
+                <ion-item
+                  button
+                  (click)="dataService.toggleStatus(product.name)"
+                  class="cursor-pointer"
                 >
-                </ion-toggle>
-              </ion-item>
-              <ion-item-options side="end">
-                <ion-item-option
-                  color="danger"
-                  (click)="dataService.delete(product.name)"
-                >
-                  Borrar
-                </ion-item-option>
-              </ion-item-options>
-            </ion-item-sliding>
+                  <ion-label class="truncate">{{product.name}}</ion-label>
+                  <span
+                    slot="end"
+                    [class.invisible]="product.checked"
+                    class="min-w-14 text-center font-bold bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer rounded-xl m-2 py-2"
+                    (click)="addQuantity(product.name)"
+                    StopPropagation
+                  >x{{product.quantity}}</span>
+                  <ion-toggle
+                    slot="end"
+                    [checked]="product.checked"
+                    (ionChange)="dataService.toggleStatus(product.name)"
+                    StopPropagation
+                  >
+                  </ion-toggle>
+                </ion-item>
+                <ion-item-options side="end">
+                  <ion-item-option
+                    color="danger"
+                    (click)="dataService.delete(product.name)"
+                  >
+                    Borrar
+                  </ion-item-option>
+                </ion-item-options>
+              </ion-item-sliding>
+            </ng-container>
+          </ion-list>
+        </ng-container>
+
+        <!-- Advanced mode: grouped by category -->
+        <ng-container *ngIf="settingsService.isAdvanced()">
+          <ng-container *ngFor="let category of groupKeys()">
+            <ion-list-header>
+              <ion-label class="font-bold">
+                <ion-icon name="pricetag-outline" class="mr-1"></ion-icon>
+                {{ category }}
+              </ion-label>
+            </ion-list-header>
+            <ion-list lines="inset">
+              <ng-container *ngFor="let product of groupedProducts()[category]">
+                <ion-item-sliding>
+                  <ion-item
+                    button
+                    (click)="dataService.toggleStatus(product.name)"
+                    class="cursor-pointer"
+                  >
+                    <ion-label>
+                      <h2 class="truncate">{{product.name}}</h2>
+                      <p *ngIf="product.price" class="text-green-600">
+                        {{product.price | number:'1.2-2'}} €
+                      </p>
+                      <p *ngIf="product.notes" class="text-gray-500 text-xs">
+                        {{product.notes}}
+                      </p>
+                    </ion-label>
+                    <span
+                      slot="end"
+                      [class.invisible]="product.checked"
+                      class="min-w-14 text-center font-bold bg-gray-200 border hover:bg-gray-400 hover:text-white cursor-pointer rounded-xl m-2 py-2"
+                      (click)="addQuantity(product.name)"
+                      StopPropagation
+                    >x{{product.quantity}}</span>
+                    <ion-toggle
+                      slot="end"
+                      [checked]="product.checked"
+                      (ionChange)="dataService.toggleStatus(product.name)"
+                      StopPropagation
+                    >
+                    </ion-toggle>
+                  </ion-item>
+                  <ion-item-options side="end">
+                    <ion-item-option
+                      color="danger"
+                      (click)="dataService.delete(product.name)"
+                    >
+                      Borrar
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+              </ng-container>
+            </ion-list>
           </ng-container>
-        </ion-list>
+        </ng-container>
       </ion-col>
     </ion-row>
   </ion-grid>

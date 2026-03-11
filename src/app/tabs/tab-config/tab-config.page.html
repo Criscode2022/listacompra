@@ -1,0 +1,79 @@
+<app-header title="Configuración" icon="settings"></app-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <ion-list>
+          <ion-list-header>
+            <ion-label class="font-bold text-lg">Modo de la app</ion-label>
+          </ion-list-header>
+
+          <ion-item>
+            <ion-icon
+              name="swap-horizontal-outline"
+              slot="start"
+              class="text-xl"
+            ></ion-icon>
+            <ion-label>
+              <h2>Modo avanzado</h2>
+              <p>Activa categorías, precios y notas</p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="settingsService.mode() === 'advanced'"
+              (ionChange)="onModeToggle($event)"
+            ></ion-toggle>
+          </ion-item>
+        </ion-list>
+
+        <div class="ion-padding">
+          <ion-card
+            [color]="settingsService.mode() === 'advanced' ? 'primary' : 'light'"
+            class="ion-no-margin"
+          >
+            <ion-card-header>
+              <ion-card-subtitle>Modo actual</ion-card-subtitle>
+              <ion-card-title>
+                {{ settingsService.mode() === 'advanced' ? 'Avanzado' : 'Básico' }}
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div *ngIf="settingsService.mode() === 'basic'">
+                <p class="mb-2">El modo básico incluye:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Gestión de despensa</li>
+                  <li>Lista de la compra</li>
+                  <li>Productos urgentes</li>
+                  <li>Control de cantidades</li>
+                </ul>
+              </div>
+              <div *ngIf="settingsService.mode() === 'advanced'">
+                <p class="mb-2">El modo avanzado añade:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Categorías para organizar productos</li>
+                  <li>Precio estimado por producto</li>
+                  <li>Notas y observaciones</li>
+                  <li>Coste total estimado en la lista</li>
+                  <li>Agrupación por categorías</li>
+                </ul>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+
+        <div *ngIf="settingsService.mode() === 'advanced'" class="ion-padding">
+          <ion-list>
+            <ion-list-header>
+              <ion-label class="font-bold text-lg">Categorías disponibles</ion-label>
+            </ion-list-header>
+            <ion-item *ngFor="let category of categories">
+              <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+              <ion-label>{{ category }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

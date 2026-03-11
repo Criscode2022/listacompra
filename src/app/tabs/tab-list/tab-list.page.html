@@ -5,9 +5,21 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6">
-          <ion-list>
-            <ng-container *ngFor="let product of pendingProducts()">
-              <ng-container *ngIf="!product.checked">
+          <!-- Advanced: estimated total -->
+          <div
+            *ngIf="settingsService.isAdvanced() && estimatedTotal() > 0"
+            class="ion-padding-horizontal ion-padding-top"
+          >
+            <ion-chip color="success">
+              <ion-icon name="cash-outline"></ion-icon>
+              <ion-label>Total estimado: {{estimatedTotal() | number:'1.2-2'}} €</ion-label>
+            </ion-chip>
+          </div>
+
+          <!-- Basic mode: flat list -->
+          <ng-container *ngIf="!settingsService.isAdvanced()">
+            <ion-list>
+              <ng-container *ngFor="let product of pendingProducts()">
                 <ion-item>
                   <ion-label>{{ product.name }}</ion-label>
                   <span class="font-bold mr-2">x{{product.quantity}}</span>
@@ -18,8 +30,41 @@
                   </ion-checkbox>
                 </ion-item>
               </ng-container>
+            </ion-list>
+          </ng-container>
+
+          <!-- Advanced mode: grouped by category -->
+          <ng-container *ngIf="settingsService.isAdvanced()">
+            <ng-container *ngFor="let category of groupKeys()">
+              <ion-list-header>
+                <ion-label class="font-bold">
+                  <ion-icon name="pricetag-outline" class="mr-1"></ion-icon>
+                  {{ category }}
+                </ion-label>
+              </ion-list-header>
+              <ion-list>
+                <ng-container *ngFor="let product of groupedPending()[category]">
+                  <ion-item>
+                    <ion-label>
+                      <h2>{{ product.name }}</h2>
+                      <p *ngIf="product.price" class="text-green-600">
+                        {{product.price | number:'1.2-2'}} € × {{product.quantity}} = {{(product.price * product.quantity) | number:'1.2-2'}} €
+                      </p>
+                      <p *ngIf="product.notes" class="text-gray-500 text-xs">
+                        {{product.notes}}
+                      </p>
+                    </ion-label>
+                    <span class="font-bold mr-2">x{{product.quantity}}</span>
+                    <ion-checkbox
+                      slot="end"
+                      (ionChange)="dataService.toggleStatus(product.name)"
+                    >
+                    </ion-checkbox>
+                  </ion-item>
+                </ng-container>
+              </ion-list>
             </ng-container>
-          </ion-list>
+          </ng-container>
         </ion-col>
       </ion-row>
     </ion-grid>

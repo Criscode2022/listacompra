@@ -8,7 +8,17 @@
           <ion-list>
             <ng-container *ngFor="let product of urgentProducts()">
               <ion-item>
-                <ion-label>{{ product.name }}</ion-label>
+                <ion-label>
+                  <h2>{{ product.name }}</h2>
+                  <ng-container *ngIf="settingsService.isAdvanced()">
+                    <p *ngIf="product.price" class="text-green-600">
+                      {{product.price | number:'1.2-2'}} €
+                    </p>
+                    <p *ngIf="product.notes" class="text-gray-500 text-xs">
+                      {{product.notes}}
+                    </p>
+                  </ng-container>
+                </ion-label>
                 <ion-checkbox
                   slot="end"
                   [(ngModel)]="product.checked"
