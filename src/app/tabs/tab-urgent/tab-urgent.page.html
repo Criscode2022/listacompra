@@ -1,14 +1,61 @@
 <app-header title="Urgente" icon="alert" color="danger"></app-header>
 
 <ion-content>
+  <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0">
+    <div class="filter-scroll">
+      <button
+        class="filter-chip"
+        [class.active]="selectedFilter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        <ion-icon name="grid-outline"></ion-icon>
+        <span>Todo</span>
+        <span class="filter-count">{{ categoryCounts()['all'] }}</span>
+      </button>
+      <ng-container *ngFor="let cat of categories">
+        <button
+          *ngIf="categoryCounts()[cat.value] > 0"
+          class="filter-chip"
+          [class.active]="selectedFilter() === cat.value"
+          [style.--chip-color]="cat.color"
+          (click)="setFilter(cat.value)"
+        >
+          <ion-icon
+            [name]="isAssetIcon(cat.icon) ? undefined : cat.icon"
+            [src]="isAssetIcon(cat.icon) ? cat.icon : undefined"
+          ></ion-icon>
+          <span>{{ cat.label }}</span>
+          <span class="filter-count">{{ categoryCounts()[cat.value] }}</span>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
   <ng-container *ngIf="urgentProducts().length; else empty">
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6">
-          <ion-list>
+          <ion-list class="urgent-list">
             <ng-container *ngFor="let product of urgentProducts()">
-              <ion-item>
-                <ion-label>{{ product.name }}</ion-label>
+              <ion-item class="urgent-item">
+                <div
+                  class="category-dot"
+                  slot="start"
+                  [style.background]="getCategoryColor(product.category)"
+                ></div>
+                <ion-label class="product-label">
+                  <h3 class="product-name">{{ product.name }}</h3>
+                  <p class="product-meta">
+                    <span class="quantity-tag"
+                      >{{ product.quantity }}{{ product.unit }}</span
+                    >
+                    <ion-icon
+                      [name]="getCategoryIconName(product.category)"
+                      [src]="getCategoryIconSrc(product.category)"
+                      class="meta-icon"
+                    ></ion-icon>
+                  </p>
+                </ion-label>
                 <ion-checkbox
                   slot="end"
                   [(ngModel)]="product.checked"

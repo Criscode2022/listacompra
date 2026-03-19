@@ -28,7 +28,14 @@ export class DataService {
       return;
     }
 
-    this.products.set(products);
+    // Migrate old products that don't have unit/category
+    const migrated = products.map((p: any) => ({
+      ...p,
+      unit: p.unit || 'ud',
+      category: p.category || 'otros',
+    }));
+
+    this.products.set(migrated);
   }
 
   public storeData(products: Product[]) {

@@ -1,0 +1,115 @@
+<ion-header class="modal-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" class="close-btn">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modal-content">
+  <div class="modal-body">
+    <!-- Product Name -->
+    <div class="form-section">
+      <label class="form-label">
+        <ion-icon name="create-outline"></ion-icon>
+        Nombre del producto
+      </label>
+      <div class="input-wrapper">
+        <input
+          type="text"
+          class="product-input"
+          placeholder="Ej: Leche, Pan, Manzanas..."
+          [(ngModel)]="productName"
+          maxlength="30"
+          (keydown)="onEnterKey($event)"
+          autofocus
+        />
+        <span class="char-count">{{ productName.length }}/30</span>
+      </div>
+    </div>
+
+    <!-- Quantity + Unit Row -->
+    <div class="form-section">
+      <label class="form-label">
+        <ion-icon name="calculator-outline"></ion-icon>
+        Cantidad y medida
+      </label>
+      <div class="quantity-unit-row">
+        <div class="quantity-stepper">
+          <button
+            class="stepper-btn"
+            (click)="adjustQuantity(-1)"
+            [disabled]="quantity <= 1"
+          >
+            <ion-icon name="remove"></ion-icon>
+          </button>
+          <input
+            type="number"
+            class="quantity-input"
+            [(ngModel)]="quantity"
+            min="1"
+            max="999"
+          />
+          <button
+            class="stepper-btn"
+            (click)="adjustQuantity(1)"
+            [disabled]="quantity >= 999"
+          >
+            <ion-icon name="add"></ion-icon>
+          </button>
+        </div>
+        <div class="unit-pills">
+          <button
+            *ngFor="let unit of measureUnits"
+            class="unit-pill"
+            [class.active]="selectedUnit === unit.value"
+            (click)="selectUnit(unit.value)"
+          >
+            {{ unit.value }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-section">
+      <label class="form-label">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        Categoría
+      </label>
+      <div class="category-grid">
+        <button
+          *ngFor="let cat of categories"
+          class="category-chip"
+          [class.active]="selectedCategory === cat.value"
+          [style.--cat-color]="cat.color"
+          (click)="selectCategory(cat.value)"
+        >
+          <ion-icon
+            [name]="isAssetIcon(cat.icon) ? undefined : cat.icon"
+            [src]="isAssetIcon(cat.icon) ? cat.icon : undefined"
+          ></ion-icon>
+          <span>{{ cat.label }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="modal-footer">
+  <div class="action-row">
+    <button class="btn-cancel" (click)="dismiss()">Cancelar</button>
+    <button
+      class="btn-confirm"
+      [class.urgent]="isUrgent"
+      [disabled]="!productName.trim()"
+      (click)="confirm()"
+    >
+      <ion-icon [name]="isUrgent ? 'alert-circle' : 'add-circle'"></ion-icon>
+      Añadir
+    </button>
+  </div>
+</ion-footer>
