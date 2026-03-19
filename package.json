@@ -34,6 +34,7 @@
     "@ionic/storage-angular": "^4.0.0",
     "ionic-app-base": "file:",
     "ionicons": "^7.1.2",
+    "jspdf": "^2.5.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.6.1",
     "zone.js": "^0.14.10"

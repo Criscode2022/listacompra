@@ -17,5 +17,14 @@
     >
       <ion-icon slot="icon-only" name="trash"></ion-icon>
     </ion-button>
+    <ion-button
+      *ngIf="actionButtonIcon"
+      slot="end"
+      class="ion-margin"
+      color="success"
+      (click)="actionButtonCallback?.()"
+    >
+      <ion-icon slot="icon-only" [name]="actionButtonIcon"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>

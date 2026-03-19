@@ -1,4 +1,9 @@
-<app-header title="Lista de la compra" icon="reader"></app-header>
+<app-header
+  title="Lista de la compra"
+  icon="reader"
+  [actionButtonIcon]="'download'"
+  [actionButtonCallback]="exportToPdf.bind(this)"
+></app-header>
 
 <ion-content>
   <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0">

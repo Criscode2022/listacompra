@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule } from '@ionic/angular';
@@ -8,13 +9,15 @@ import { DataService } from 'src/app/core/services/data-service/data.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonicModule, CommonModule],
 })
 export class HeaderComponent {
   @Input() title = '';
   @Input() icon = '';
   @Input() color = 'primary';
   @Input() deleteButtonInvisible = true;
+  @Input() actionButtonIcon: string | undefined;
+  @Input() actionButtonCallback: (() => void) | undefined;
 
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);
