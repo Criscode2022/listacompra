@@ -28,10 +28,15 @@ export class HeaderComponent {
       return;
     }
 
+    const isDesktop =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px)').matches;
+
     const alert = await this.alertController.create({
       header: 'Confirmar borrado',
-      message:
-        '¿Seguro que quieres borrar todos los productos? Si solo quieres eliminar un producto puedes deslizarlo hacia la izquierda',
+      message: isDesktop
+        ? '¿Seguro que quieres borrar todos los productos? Esta acción no puede ser revertida'
+        : '¿Seguro que quieres borrar todos los productos? Si solo quieres eliminar un producto puedes deslizarlo hacia la izquierda',
       buttons: [
         {
           text: 'Cancelar',
