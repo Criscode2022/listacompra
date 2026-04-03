@@ -5,6 +5,23 @@
 /* ─── Product Items ─── */
 .product-list {
   background: transparent;
+  padding: 0 12px 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.product-list ion-item-sliding {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .product-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    column-gap: 12px;
+    row-gap: 10px;
+  }
 }
 
 .product-item {

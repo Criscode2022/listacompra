@@ -89,13 +89,21 @@ export class TabPantry {
   }
 
   protected async addProduct() {
+    const isDesktop =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px)').matches;
+
     const modal = await this.modalController.create({
       component: AddProductModalComponent,
       componentProps: { isUrgent: false },
       cssClass: 'add-product-modal',
-      breakpoints: [0, 1],
-      initialBreakpoint: 1,
-      handle: false,
+      ...(isDesktop
+        ? {}
+        : {
+            breakpoints: [0, 1],
+            initialBreakpoint: 1,
+            handle: false,
+          }),
     });
 
     await modal.present();

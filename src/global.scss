@@ -26,7 +26,12 @@
 
 /* ─── Modern Font ─── */
 * {
-  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    "Roboto",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 .empty {
@@ -54,8 +59,8 @@ ion-item {
   }
 
   @media (min-width: 768px) {
-    --width: 480px;
-    --height: auto;
+    --width: min(480px, calc(100vw - 32px));
+    --height: min(720px, 85vh);
     --max-height: 85vh;
 
     &::part(content) {

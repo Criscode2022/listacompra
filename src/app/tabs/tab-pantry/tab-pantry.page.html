@@ -37,66 +37,61 @@
   </div>
 
   <!-- Product List -->
-  <ng-container *ngIf="pantryProducts().length; else empty"></ng-container>
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="6">
-        <ion-list lines="inset" class="product-list">
-          <ng-container *ngFor="let product of pantryProducts()">
-            <ion-item-sliding>
-              <ion-item
-                button
-                (click)="dataService.toggleStatus(product.name)"
-                class="product-item"
-              >
-                <div
-                  class="category-dot"
-                  slot="start"
-                  [style.background]="getCategoryColor(product.category)"
-                ></div>
-                <ion-label class="product-label">
-                  <h3 class="product-name">{{ product.name }}</h3>
-                  <p class="product-meta">
-                    <ion-icon
-                      [name]="getCategoryIconName(product.category)"
-                      [src]="getCategoryIconSrc(product.category)"
-                      class="meta-icon"
-                    ></ion-icon>
-                    {{ product.unit !== 'ud' ? product.unit : '' }}
-                  </p>
-                </ion-label>
-                <span
-                  slot="end"
-                  [class.invisible]="product.checked"
-                  class="quantity-badge"
-                  (click)="editQuantity(product.name, product.quantity)"
-                  StopPropagation
-                >
-                  {{ product.quantity }}{{ product.unit !== 'ud' ? product.unit
-                  : 'x' }}
-                </span>
-                <ion-toggle
-                  slot="end"
-                  [checked]="product.checked"
-                  (ionChange)="dataService.toggleStatus(product.name)"
-                  StopPropagation
-                >
-                </ion-toggle>
-              </ion-item>
-              <ion-item-options side="end">
-                <ion-item-option
-                  color="danger"
-                  (click)="dataService.delete(product.name)"
-                >
-                  Borrar
-                </ion-item-option>
-              </ion-item-options>
-            </ion-item-sliding>
-          </ng-container>
-        </ion-list>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <ng-container *ngIf="pantryProducts().length; else empty">
+    <ion-list lines="inset" class="product-list">
+      <ng-container *ngFor="let product of pantryProducts()">
+        <ion-item-sliding>
+          <ion-item
+            button
+            (click)="dataService.toggleStatus(product.name)"
+            class="product-item"
+          >
+            <div
+              class="category-dot"
+              slot="start"
+              [style.background]="getCategoryColor(product.category)"
+            ></div>
+            <ion-label class="product-label">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-meta">
+                <ion-icon
+                  [name]="getCategoryIconName(product.category)"
+                  [src]="getCategoryIconSrc(product.category)"
+                  class="meta-icon"
+                ></ion-icon>
+                {{ product.unit !== 'ud' ? product.unit : '' }}
+              </p>
+            </ion-label>
+            <span
+              slot="end"
+              [class.invisible]="product.checked"
+              class="quantity-badge"
+              (click)="editQuantity(product.name, product.quantity)"
+              StopPropagation
+            >
+              {{ product.quantity }}{{ product.unit !== 'ud' ? product.unit :
+              'x' }}
+            </span>
+            <ion-toggle
+              slot="end"
+              [checked]="product.checked"
+              (ionChange)="dataService.toggleStatus(product.name)"
+              StopPropagation
+            >
+            </ion-toggle>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option
+              color="danger"
+              (click)="dataService.delete(product.name)"
+            >
+              Borrar
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ng-container>
+    </ion-list>
+  </ng-container>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="addProduct()">
       <ion-icon name="add"></ion-icon>
