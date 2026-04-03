@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
@@ -35,6 +41,10 @@ export class TabPantry {
   protected products = this.dataService.products;
   protected categories = PRODUCT_CATEGORIES;
   protected measureUnits = MEASURE_UNITS;
+  protected isDesktop = signal(
+    typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px)').matches,
+  );
 
   protected selectedFilter = signal<ProductCategory | 'all'>('all');
 
@@ -88,10 +98,22 @@ export class TabPantry {
     return this.measureUnits.find((u) => u.value === unit)?.label ?? unit;
   }
 
-  protected async addProduct() {
-    const isDesktop =
+  @HostListener('window:resize')
+  protected onWindowResize() {
+    this.isDesktop.set(
       typeof window !== 'undefined' &&
-      window.matchMedia('(min-width: 768px)').matches;
+        window.matchMedia('(min-width: 768px)').matches,
+    );
+  }
+
+  protected deleteProduct(productName: string, event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.dataService.delete(productName);
+  }
+
+  protected async addProduct() {
+    const isDesktop = this.isDesktop();
 
     const modal = await this.modalController.create({
       component: AddProductModalComponent,

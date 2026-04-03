@@ -1,54 +1,19 @@
 @use "../category-filter" as categoryFilter;
+@use "../product-item-shared" as productItemShared;
 
 @include categoryFilter.category-filter-bar;
+@include productItemShared.product-item-shared(
+  "urgent-list",
+  "urgent-item",
+  6px
+);
 
 /* ─── Urgent Product Items ─── */
-.urgent-list {
-  background: transparent;
-}
-
-.urgent-item {
-  --padding-start: 12px;
-}
-
-.category-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-right: 4px;
-}
-
-.product-label {
-  h3.product-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  p.product-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #888;
-    margin: 2px 0 0;
-
-    .quantity-tag {
-      background: #fee2e5;
-      color: #e64980;
-      padding: 1px 8px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 11px;
-    }
-
-    .meta-icon {
-      font-size: 13px;
-    }
-  }
+.quantity-tag {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 11px;
+  background: #fee2e5;
+  color: #e64980;
 }

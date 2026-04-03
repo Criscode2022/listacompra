@@ -1,11 +1,18 @@
 @use "../category-filter" as categoryFilter;
+@use "../product-item-shared" as productItemShared;
 
 @include categoryFilter.category-filter-bar;
+@include productItemShared.product-item-shared(
+  "product-list",
+  "product-item",
+  4px
+);
 
 /* ─── Product Items ─── */
 .product-list {
-  background: transparent;
-  padding: 0 12px 12px;
+  @apply pb-3;
+  padding-left: 12px;
+  padding-right: 12px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
@@ -25,58 +32,19 @@
 }
 
 .product-item {
-  --padding-start: 12px;
-  cursor: pointer;
+  @apply cursor-pointer;
 }
 
 .category-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-right: 4px;
   box-shadow: 0 0 6px
     color-mix(in srgb, var(--cat-color, #888) 40%, transparent);
 }
 
-.product-label {
-  h3.product-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  p.product-meta {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: #888;
-    margin: 2px 0 0;
-
-    .meta-icon {
-      font-size: 13px;
-    }
-  }
-}
-
 .quantity-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-weight: 700;
+  @apply inline-flex items-center justify-center min-w-11 py-1.5 px-2.5 text-[13px] font-bold rounded-xl cursor-pointer;
   color: #333;
   background: #f1f3f5;
   border: 1.5px solid #dee2e6;
-  border-radius: 12px;
-  cursor: pointer;
   transition: all 0.2s ease;
   margin: 4px 8px 4px 0;
 
@@ -88,5 +56,36 @@
 
   &:active {
     transform: scale(0.95);
+  }
+}
+
+.desktop-delete-button {
+  @apply inline-flex items-center justify-center rounded-full p-0 cursor-pointer;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border: 1.5px solid #fa5252;
+  background: #ffe3e3;
+  color: #e03131;
+  margin: 0 18px 0 4px;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+
+  &.quantity-hidden {
+    margin-left: auto;
+    margin-right: 6px;
+  }
+
+  ion-icon {
+    @apply text-[13px];
+  }
+
+  &:hover {
+    background: #ffc9c9;
+  }
+
+  &:active {
+    transform: scale(0.92);
   }
 }

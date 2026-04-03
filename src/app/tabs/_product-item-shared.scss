@@ -1,0 +1,28 @@
+@mixin product-item-shared($list-class, $item-class, $meta-gap: 6px) {
+  .#{$list-class} {
+    @apply bg-transparent;
+  }
+
+  .#{$item-class} {
+    --padding-start: 12px;
+  }
+
+  .category-dot {
+    @apply w-2.5 h-2.5 rounded-full shrink-0 mr-1;
+  }
+
+  .product-label {
+    h3.product-name {
+      @apply text-[15px] font-semibold text-[#1a1a2e] m-0 whitespace-nowrap overflow-hidden text-ellipsis;
+    }
+
+    p.product-meta {
+      @apply flex items-center text-xs text-[#888] mt-0.5;
+      gap: $meta-gap;
+
+      .meta-icon {
+        @apply text-[13px];
+      }
+    }
+  }
+}

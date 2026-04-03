@@ -40,7 +40,7 @@
   <ng-container *ngIf="pantryProducts().length; else empty">
     <ion-list lines="inset" class="product-list">
       <ng-container *ngFor="let product of pantryProducts()">
-        <ion-item-sliding>
+        <ion-item-sliding [disabled]="isDesktop()">
           <ion-item
             button
             (click)="dataService.toggleStatus(product.name)"
@@ -62,9 +62,22 @@
                 {{ product.unit !== 'ud' ? product.unit : '' }}
               </p>
             </ion-label>
-            <span
+            <button
+              *ngIf="isDesktop()"
               slot="end"
-              [class.invisible]="product.checked"
+              type="button"
+              class="desktop-delete-button"
+              [class.quantity-hidden]="product.checked"
+              title="Doble click para eliminar"
+              aria-label="Doble click para eliminar"
+              (dblclick)="deleteProduct(product.name, $event)"
+              StopPropagation
+            >
+              <ion-icon name="close"></ion-icon>
+            </button>
+            <span
+              *ngIf="!product.checked"
+              slot="end"
               class="quantity-badge"
               (click)="editQuantity(product.name, product.quantity)"
               StopPropagation
@@ -80,7 +93,7 @@
             >
             </ion-toggle>
           </ion-item>
-          <ion-item-options side="end">
+          <ion-item-options side="end" *ngIf="!isDesktop()">
             <ion-item-option
               color="danger"
               (click)="dataService.delete(product.name)"
