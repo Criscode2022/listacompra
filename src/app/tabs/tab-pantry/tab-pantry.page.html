@@ -71,7 +71,7 @@
               title="Doble click para eliminar"
               aria-label="Doble click para eliminar"
               (dblclick)="deleteProduct(product.name, $event)"
-              StopPropagation
+              appStopPropagation
             >
               <ion-icon name="close"></ion-icon>
             </button>
@@ -80,7 +80,7 @@
               slot="end"
               class="quantity-badge"
               (click)="editQuantity(product.name, product.quantity)"
-              StopPropagation
+              appStopPropagation
             >
               {{ product.quantity }}{{ product.unit !== 'ud' ? product.unit :
               'x' }}
@@ -89,7 +89,7 @@
               slot="end"
               [checked]="product.checked"
               (ionChange)="dataService.toggleStatus(product.name)"
-              StopPropagation
+              appStopPropagation
             >
             </ion-toggle>
           </ion-item>

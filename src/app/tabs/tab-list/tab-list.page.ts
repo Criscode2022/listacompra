@@ -24,7 +24,7 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
     HeaderComponent,
   ],
 })
-export class TabList {
+export class TabListPage {
   protected dataService = inject(DataService);
   protected categories = PRODUCT_CATEGORIES;
   protected selectedFilter = signal<ProductCategory | 'all'>('all');

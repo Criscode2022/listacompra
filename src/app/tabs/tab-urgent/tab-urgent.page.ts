@@ -19,7 +19,7 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
 })
-export class TabUrgent {
+export class TabUrgentPage {
   private modalController = inject(ModalController);
   private dataService = inject(DataService);
   private snackbar = inject(MatSnackBar);

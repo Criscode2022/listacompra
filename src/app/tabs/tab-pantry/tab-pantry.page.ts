@@ -32,7 +32,7 @@ import { StopPropagationDirective } from '../../core/directives/stop-propagation
     StopPropagationDirective,
   ],
 })
-export class TabPantry {
+export class TabPantryPage {
   private modalController = inject(ModalController);
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);
