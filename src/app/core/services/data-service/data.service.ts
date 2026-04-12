@@ -10,11 +10,15 @@ export class DataService {
   private _storage: Storage | null = null;
   public storageInitialized = new BehaviorSubject<void>(undefined);
   public products = signal<Product[]>([]);
+  public basicMode = signal<boolean>(false);
 
   constructor(private storage: Storage) {
     this.initStorage();
     effect(() => {
       this.storeData(this.products());
+    });
+    effect(() => {
+      this._storage?.set('settings', { basicMode: this.basicMode() });
     });
   }
 
@@ -24,18 +28,20 @@ export class DataService {
 
     const products = await this._storage.get('products');
 
-    if (!products) {
-      return;
+    if (products) {
+      // Migrate old products that don't have unit/category
+      const migrated = products.map((p: any) => ({
+        ...p,
+        unit: p.unit || 'ud',
+        category: p.category || 'otros',
+      }));
+      this.products.set(migrated);
     }
 
-    // Migrate old products that don't have unit/category
-    const migrated = products.map((p: any) => ({
-      ...p,
-      unit: p.unit || 'ud',
-      category: p.category || 'otros',
-    }));
-
-    this.products.set(migrated);
+    const settings = await this._storage.get('settings');
+    if (settings?.basicMode !== undefined) {
+      this.basicMode.set(Boolean(settings.basicMode));
+    }
   }
 
   public storeData(products: Product[]) {

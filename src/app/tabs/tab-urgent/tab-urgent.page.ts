@@ -21,7 +21,7 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
 })
 export class TabUrgentPage {
   private modalController = inject(ModalController);
-  private dataService = inject(DataService);
+  protected dataService = inject(DataService);
   private snackbar = inject(MatSnackBar);
 
   protected products = this.dataService.products;

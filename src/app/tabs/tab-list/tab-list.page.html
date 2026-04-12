@@ -6,7 +6,7 @@
 ></app-header>
 
 <ion-content>
-  <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0">
+  <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0 && !dataService.basicMode()">
     <div class="filter-scroll">
       <button
         class="filter-chip"
@@ -42,6 +42,7 @@
         <ng-container *ngIf="!product.checked">
           <ion-item class="shopping-item">
             <div
+              *ngIf="!dataService.basicMode()"
               class="category-dot"
               slot="start"
               [style.background]="getCategoryColor(product.category)"
@@ -53,6 +54,7 @@
                   >{{ product.quantity }}{{ product.unit }}</span
                 >
                 <ion-icon
+                  *ngIf="!dataService.basicMode()"
                   [name]="getCategoryIconName(product.category)"
                   [src]="getCategoryIconSrc(product.category)"
                   class="meta-icon"

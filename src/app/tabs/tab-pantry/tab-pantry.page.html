@@ -6,7 +6,7 @@
 
 <ion-content>
   <!-- Category Filter Bar -->
-  <div class="filter-bar" *ngIf="products().length">
+  <div class="filter-bar" *ngIf="products().length && !dataService.basicMode()">
     <div class="filter-scroll">
       <button
         class="filter-chip"
@@ -47,6 +47,7 @@
             class="product-item"
           >
             <div
+              *ngIf="!dataService.basicMode()"
               class="category-dot"
               slot="start"
               [style.background]="getCategoryColor(product.category)"
@@ -55,6 +56,7 @@
               <h3 class="product-name">{{ product.name }}</h3>
               <p class="product-meta">
                 <ion-icon
+                  *ngIf="!dataService.basicMode()"
                   [name]="getCategoryIconName(product.category)"
                   [src]="getCategoryIconSrc(product.category)"
                   class="meta-icon"

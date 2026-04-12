@@ -1,0 +1,104 @@
+<ion-header class="settings-header">
+  <ion-toolbar>
+    <ion-title>Configuración</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" class="close-btn">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="settings-content">
+
+  <!-- Data section -->
+  <div class="settings-section">
+    <p class="section-title">Datos</p>
+    <div class="settings-card">
+
+      <button class="settings-row" (click)="exportProducts()">
+        <div class="row-icon" style="--row-icon-color: #34c759">
+          <ion-icon name="download-outline"></ion-icon>
+        </div>
+        <div class="row-text">
+          <span class="row-label">Exportar productos</span>
+          <span class="row-sublabel">Descarga productos.json</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="row-chevron"></ion-icon>
+      </button>
+
+      <div class="divider"></div>
+
+      <button class="settings-row" (click)="importProducts()">
+        <div class="row-icon" style="--row-icon-color: #007aff">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </div>
+        <div class="row-text">
+          <span class="row-label">Importar productos</span>
+          <span class="row-sublabel">Carga desde productos.json</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="row-chevron"></ion-icon>
+      </button>
+
+      <div class="divider"></div>
+
+      <button class="settings-row" (click)="clearAllData()">
+        <div class="row-icon" style="--row-icon-color: #ff3b30">
+          <ion-icon name="trash-outline"></ion-icon>
+        </div>
+        <span class="row-label danger">Eliminar todos los productos</span>
+        <ion-icon name="chevron-forward-outline" class="row-chevron danger"></ion-icon>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Display section -->
+  <div class="settings-section">
+    <p class="section-title">Apariencia</p>
+    <div class="settings-card">
+
+      <div class="settings-row non-interactive">
+        <div class="row-icon" style="--row-icon-color: #ff9500">
+          <ion-icon name="albums-outline"></ion-icon>
+        </div>
+        <div class="row-text">
+          <span class="row-label">Modo básico</span>
+          <span class="row-sublabel">Ocultar categorías y filtros</span>
+        </div>
+        <ion-toggle
+          [checked]="dataService.basicMode()"
+          (ionChange)="dataService.basicMode.set($event.detail.checked)"
+        ></ion-toggle>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- About section -->
+  <div class="settings-section">
+    <p class="section-title">Información</p>
+    <div class="settings-card">
+
+      <div class="settings-row non-interactive">
+        <div class="row-icon" style="--row-icon-color: #5856d6">
+          <ion-icon name="list-outline"></ion-icon>
+        </div>
+        <span class="row-label">Lista de la Compra</span>
+        <span class="row-value">v1.0</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="settings-row non-interactive">
+        <div class="row-icon" style="--row-icon-color: #636366">
+          <ion-icon name="grid-outline"></ion-icon>
+        </div>
+        <span class="row-label">Productos guardados</span>
+        <span class="row-value">{{ dataService.products().length }}</span>
+      </div>
+
+    </div>
+  </div>
+
+</ion-content>

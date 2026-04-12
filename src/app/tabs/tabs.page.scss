@@ -199,6 +199,64 @@
   }
 }
 
+/* ─── Settings FAB ─── */
+
+.settings-fab {
+  position: fixed;
+  /* Match the vertical position of ion-fab vertical="bottom":
+     ~56px tab bar + 16px mb-4 + 16px fab default offset */
+  bottom: 88px;
+  left: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.12) 30%,
+    rgba(200, 220, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.10) 70%,
+    rgba(240, 240, 255, 0.35) 100%
+  );
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+  box-shadow:
+    0 8px 40px rgba(100, 120, 200, 0.15),
+    0 2px 12px rgba(100, 120, 200, 0.10),
+    inset 0 2px 3px rgba(255, 255, 255, 0.80),
+    inset 0 -2px 4px rgba(100, 120, 180, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s ease;
+
+  ion-icon {
+    font-size: 22px;
+    color: rgba(60, 60, 67, 0.72);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:active {
+    transform: scale(0.90);
+    ion-icon { transform: rotate(30deg); }
+  }
+
+  &:hover {
+    box-shadow:
+      0 12px 48px rgba(100, 120, 200, 0.22),
+      0 4px 16px rgba(100, 120, 200, 0.12),
+      inset 0 2px 3px rgba(255, 255, 255, 0.85),
+      inset 0 -2px 4px rgba(100, 120, 180, 0.10);
+    border-color: rgba(255, 255, 255, 0.70);
+  }
+}
+
 /* ─── Animations ─── */
 
 /* Slow-moving chromatic rainbow shimmer */

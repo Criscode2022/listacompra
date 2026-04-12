@@ -1,0 +1,130 @@
+/* ─── Settings Header ─── */
+
+.settings-header ion-toolbar {
+  --background: rgba(255, 255, 255, 0.72);
+  --border-color: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  ion-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+}
+
+.close-btn {
+  --color: rgba(60, 60, 67, 0.6);
+}
+
+/* ─── Settings Content ─── */
+
+.settings-content {
+  --background: #f2f2f7;
+}
+
+.settings-section {
+  padding: 20px 16px 4px;
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(60, 60, 67, 0.6);
+    margin: 0 0 8px 4px;
+  }
+}
+
+/* ─── Settings Card ─── */
+
+.settings-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &.non-interactive {
+    cursor: default;
+    &:active { background: transparent; }
+  }
+}
+
+.divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin-left: 56px;
+}
+
+/* ─── Row Icon ─── */
+
+.row-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--row-icon-color, #007aff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 18px;
+    color: #fff;
+  }
+}
+
+/* ─── Row Text ─── */
+
+.row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.row-label {
+  flex: 1;
+  font-size: 16px;
+  color: #1c1c1e;
+
+  &.danger {
+    color: #ff3b30;
+  }
+}
+
+.row-sublabel {
+  font-size: 12px;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.row-value {
+  font-size: 16px;
+  color: rgba(60, 60, 67, 0.6);
+}
+
+.row-chevron {
+  font-size: 14px;
+  color: rgba(60, 60, 67, 0.35);
+
+  &.danger {
+    color: rgba(255, 59, 48, 0.4);
+  }
+}
