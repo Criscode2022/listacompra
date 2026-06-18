@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import jsPDF from 'jspdf';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { matchesTextFilter } from 'src/app/core/utils/product-filter';
 import {
   PRODUCT_CATEGORIES,
   ProductCategory,
@@ -28,14 +29,22 @@ export class TabListPage {
   protected dataService = inject(DataService);
   protected categories = PRODUCT_CATEGORIES;
   protected selectedFilter = signal<ProductCategory | 'all'>('all');
+  protected textFilter = signal('');
 
-  protected pendingProducts = computed(() => {
+  protected tabProducts = computed(() => {
     const filter = this.selectedFilter();
     return this.dataService.products().filter((product) => {
       if (product.checked || product.urgent) return false;
       if (filter !== 'all' && product.category !== filter) return false;
       return true;
     });
+  });
+
+  protected pendingProducts = computed(() => {
+    const query = this.textFilter();
+    return this.tabProducts().filter((product) =>
+      matchesTextFilter(product.name, query),
+    );
   });
 
   protected categoryCounts = computed(() => {
@@ -53,6 +62,10 @@ export class TabListPage {
 
   protected setFilter(category: ProductCategory | 'all') {
     this.selectedFilter.set(category);
+  }
+
+  protected updateTextFilter(event: CustomEvent<{ value?: string | null }>) {
+    this.textFilter.set(event.detail?.value ?? '');
   }
 
   protected getCategoryColor(category: string): string {

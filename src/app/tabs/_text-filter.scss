@@ -1,0 +1,15 @@
+@mixin text-filter-bar {
+  .text-filter-bar {
+    padding: 0 12px 8px;
+  }
+
+  .text-filter-bar ion-searchbar {
+    --background: #f4f4f5;
+    --border-radius: 12px;
+    --box-shadow: none;
+    --icon-color: #868e96;
+    --placeholder-color: #868e96;
+    --clear-button-color: #868e96;
+    padding: 0;
+  }
+}

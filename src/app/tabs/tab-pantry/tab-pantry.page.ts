@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertController, IonicModule, ModalController } from '@ionic/angular';
 import { DataService } from 'src/app/core/services/data-service/data.service';
+import { matchesTextFilter } from 'src/app/core/utils/product-filter';
 import {
   MEASURE_UNITS,
   PRODUCT_CATEGORIES,
@@ -47,14 +48,22 @@ export class TabPantryPage {
   );
 
   protected selectedFilter = signal<ProductCategory | 'all'>('all');
+  protected textFilter = signal('');
 
-  protected pantryProducts = computed(() => {
+  protected tabProducts = computed(() => {
     const filter = this.selectedFilter();
     return this.products().filter((product) => {
       if (product.urgent) return false;
       if (filter !== 'all' && product.category !== filter) return false;
       return true;
     });
+  });
+
+  protected pantryProducts = computed(() => {
+    const query = this.textFilter();
+    return this.tabProducts().filter((product) =>
+      matchesTextFilter(product.name, query),
+    );
   });
 
   protected categoryCounts = computed(() => {
@@ -68,6 +77,10 @@ export class TabPantryPage {
 
   protected setFilter(category: ProductCategory | 'all') {
     this.selectedFilter.set(category);
+  }
+
+  protected updateTextFilter(event: CustomEvent<{ value?: string | null }>) {
+    this.textFilter.set(event.detail?.value ?? '');
   }
 
   protected getCategoryColor(category: ProductCategory): string {

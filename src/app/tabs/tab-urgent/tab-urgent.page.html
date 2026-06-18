@@ -31,7 +31,17 @@
     </div>
   </div>
 
-  <ng-container *ngIf="urgentProducts().length; else empty">
+  <div class="text-filter-bar" *ngIf="tabProducts().length">
+    <ion-searchbar
+      [value]="textFilter()"
+      (ionInput)="updateTextFilter($event)"
+      placeholder="Buscar producto..."
+      debounce="150"
+      show-clear-button="focus"
+    ></ion-searchbar>
+  </div>
+
+  <ng-container *ngIf="urgentProducts().length; else emptyOrNoMatch">
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6">
@@ -78,6 +88,12 @@
     <ion-icon name="add"></ion-icon>
   </ion-fab-button>
 </ion-fab>
+
+<ng-template #emptyOrNoMatch>
+  <div class="empty" *ngIf="textFilter().trim(); else empty">
+    No hay coincidencias para "{{ textFilter() }}".
+  </div>
+</ng-template>
 
 <ng-template #empty>
   <div class="empty">

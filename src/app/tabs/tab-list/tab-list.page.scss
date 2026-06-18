@@ -1,7 +1,9 @@
 @use "../category-filter" as categoryFilter;
+@use "../text-filter" as textFilter;
 @use "../product-item-shared" as productItemShared;
 
 @include categoryFilter.category-filter-bar;
+@include textFilter.text-filter-bar;
 @include productItemShared.product-item-shared(
   "shopping-list",
   "shopping-item",

@@ -36,7 +36,17 @@
     </div>
   </div>
 
-  <ng-container *ngIf="pendingProducts().length; else empty">
+  <div class="text-filter-bar" *ngIf="tabProducts().length">
+    <ion-searchbar
+      [value]="textFilter()"
+      (ionInput)="updateTextFilter($event)"
+      placeholder="Buscar producto..."
+      debounce="150"
+      show-clear-button="focus"
+    ></ion-searchbar>
+  </div>
+
+  <ng-container *ngIf="pendingProducts().length; else emptyOrNoMatch">
     <ion-list class="shopping-list">
       <ng-container *ngFor="let product of pendingProducts()">
         <ng-container *ngIf="!product.checked">
@@ -72,6 +82,12 @@
     </ion-list>
   </ng-container>
 </ion-content>
+
+<ng-template #emptyOrNoMatch>
+  <div class="empty" *ngIf="textFilter().trim(); else empty">
+    No hay coincidencias para "{{ textFilter() }}".
+  </div>
+</ng-template>
 
 <ng-template #empty>
   <div class="empty">
