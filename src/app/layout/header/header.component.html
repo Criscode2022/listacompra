@@ -1,28 +1,30 @@
-<ion-header [translucent]="true">
-  <ion-toolbar [color]="color">
+<ion-header [translucent]="true" class="glass-header">
+  <ion-toolbar class="glass-toolbar" [class.tint-danger]="color === 'danger'">
     <ion-icon
       slot="start"
-      class="ion-margin"
-      class="ion-padding"
+      class="header-leading-icon ion-margin"
       [name]="icon"
-      size="large "
     ></ion-icon>
     <ion-title>{{ title }}</ion-title>
     <ion-button
       [class.invisible]="deleteButtonInvisible"
       slot="end"
-      class="ion-margin"
+      class="header-action"
+      fill="clear"
       color="danger"
       (click)="clearStorage()"
+      aria-label="Borrar todos"
     >
-      <ion-icon slot="icon-only" name="trash"></ion-icon>
+      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
     </ion-button>
     <ion-button
       *ngIf="actionButtonIcon"
       slot="end"
-      class="ion-margin"
-      color="success"
+      class="header-action"
+      fill="clear"
+      color="primary"
       (click)="actionButtonCallback?.()"
+      aria-label="Acción"
     >
       <ion-icon slot="icon-only" [name]="actionButtonIcon"></ion-icon>
     </ion-button>

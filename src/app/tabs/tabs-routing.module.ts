@@ -18,7 +18,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/lista',
+    redirectTo: 'lista',
   },
 ];
 

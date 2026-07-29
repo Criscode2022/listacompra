@@ -13,14 +13,30 @@
 /* ─── Shopping List Items ─── */
 .shopping-list {
   background: transparent;
-  padding: 0 12px 12px;
+  padding: 0 12px 100px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
 }
 
-.shopping-list ion-item {
+.shopping-list ion-item.shopping-item {
   width: 100%;
+  --min-height: 68px;
+  --max-height: none;
+  height: auto;
+  --padding-top: 10px;
+  --padding-bottom: 12px;
+  /* Keep padding on Ionic vars only — host padding creates a second bottom band */
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+
+.shopping-list ion-item.shopping-item .product-label {
+  p.product-meta {
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
 }
 
 @media (min-width: 768px) {
@@ -33,10 +49,13 @@
 }
 
 .quantity-tag {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-weight: 600;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-weight: 650;
   font-size: 11px;
-  background: #e7f5ff;
-  color: #1c7ed6;
+  letter-spacing: -0.01em;
+  background: rgba(0, 122, 255, 0.12);
+  color: #007aff;
+  margin-bottom: 2px;
 }

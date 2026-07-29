@@ -1,20 +1,29 @@
-/* ─── Settings Header ─── */
+/* ─── Settings — Apple grouped list + glass header ─── */
 
 .settings-header ion-toolbar {
   --background: rgba(255, 255, 255, 0.72);
   --border-color: transparent;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  --border-width: 0;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 0.5px solid rgba(60, 60, 67, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   ion-title {
     font-size: 17px;
     font-weight: 600;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.02em;
   }
 }
 
 .close-btn {
-  --color: rgba(60, 60, 67, 0.6);
+  --color: rgba(60, 60, 67, 0.55);
+  --border-radius: 9999px;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:active {
+    transform: scale(0.9);
+  }
 }
 
 /* ─── Settings Content ─── */
@@ -24,25 +33,28 @@
 }
 
 .settings-section {
-  padding: 20px 16px 4px;
+  padding: 22px 16px 4px;
 
   .section-title {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: rgba(60, 60, 67, 0.6);
-    margin: 0 0 8px 4px;
+    letter-spacing: 0.03em;
+    color: rgba(60, 60, 67, 0.55);
+    margin: 0 0 8px 12px;
   }
 }
 
 /* ─── Settings Card ─── */
 
 .settings-card {
-  background: #fff;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 14px rgba(0, 0, 0, 0.03);
 }
 
 .settings-row {
@@ -55,7 +67,8 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
+  min-height: 48px;
 
   &:active {
     background: rgba(0, 0, 0, 0.05);
@@ -63,30 +76,34 @@
 
   &.non-interactive {
     cursor: default;
-    &:active { background: transparent; }
+
+    &:active {
+      background: transparent;
+    }
   }
 }
 
 .divider {
-  height: 1px;
-  background: rgba(0, 0, 0, 0.08);
+  height: 0.5px;
+  background: rgba(60, 60, 67, 0.12);
   margin-left: 56px;
 }
 
 /* ─── Row Icon ─── */
 
 .row-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   background: var(--row-icon-color, #007aff);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
   ion-icon {
-    font-size: 18px;
+    font-size: 17px;
     color: #fff;
   }
 }
@@ -98,11 +115,13 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .row-label {
   flex: 1;
   font-size: 16px;
+  letter-spacing: -0.01em;
   color: #1c1c1e;
 
   &.danger {
@@ -117,14 +136,65 @@
 
 .row-value {
   font-size: 16px;
-  color: rgba(60, 60, 67, 0.6);
+  color: rgba(60, 60, 67, 0.55);
 }
 
 .row-chevron {
   font-size: 14px;
-  color: rgba(60, 60, 67, 0.35);
+  color: rgba(60, 60, 67, 0.3);
 
   &.danger {
     color: rgba(255, 59, 48, 0.4);
   }
+}
+
+.online-card.active {
+  border: 1px solid rgba(0, 122, 255, 0.18);
+  box-shadow:
+    0 1px 2px rgba(0, 122, 255, 0.06),
+    0 4px 14px rgba(0, 122, 255, 0.06);
+}
+
+.online-status-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.online-user {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 16px 12px;
+  font-size: 13px;
+
+  ion-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-size: 14px;
+    color: #1c1c1e;
+  }
+
+  p {
+    margin: 2px 0 0;
+    color: rgba(60, 60, 67, 0.55);
+  }
+
+  &.pending {
+    padding-top: 4px;
+  }
+}
+
+.pending-block {
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.signout-row,
+.auth-row {
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
 }

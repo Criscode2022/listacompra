@@ -1,0 +1,118 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cuenta en la nube</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="auth-content">
+  <div class="auth-hero">
+    <ion-icon name="cloud-upload-outline"></ion-icon>
+    <h1>Sincroniza tu lista</h1>
+    <p>
+      Crea una cuenta para guardar tus productos en la nube y acceder desde
+      cualquier dispositivo.
+    </p>
+  </div>
+
+  <ion-card class="offline-banner" *ngIf="hasOfflineData && tab === 'signup'">
+    <ion-card-content>
+      <div class="banner-row">
+        <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+        <span
+          >Tus productos locales se subirán a la nube al crear la cuenta.</span
+        >
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="offline-banner muted" *ngIf="hasOfflineData && tab === 'signin'">
+    <ion-card-content>
+      <div class="banner-row">
+        <ion-icon name="swap-horizontal-outline" color="medium"></ion-icon>
+        <span
+          >Al iniciar sesión, los datos de la nube reemplazarán los de este
+          dispositivo.</span
+        >
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="tab-row">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="tab === 'signup'"
+      (click)="setTab('signup')"
+    >
+      Crear cuenta
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="tab === 'signin'"
+      (click)="setTab('signin')"
+    >
+      Iniciar sesión
+    </button>
+  </div>
+
+  <form class="auth-form" (ngSubmit)="submit()">
+    <ion-list lines="none" class="form-list">
+      <ion-item *ngIf="tab === 'signup'">
+        <ion-input
+          label="Nombre"
+          labelPlacement="stacked"
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="Tu nombre"
+          autocomplete="name"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Email"
+          labelPlacement="stacked"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="tu@email.com"
+          required
+          autocomplete="email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Contraseña"
+          labelPlacement="stacked"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Mínimo 8 caracteres"
+          required
+          minlength="8"
+          autocomplete="{{ tab === 'signup' ? 'new-password' : 'current-password' }}"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" class="submit-btn" [disabled]="loading">
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      <span *ngIf="!loading">{{
+        tab === 'signup' ? 'Crear cuenta' : 'Iniciar sesión'
+      }}</span>
+    </ion-button>
+  </form>
+
+  <p class="auth-hint">
+    Tus datos locales se mantienen en el dispositivo. La nube solo se usa si
+    activas el modo online.
+  </p>
+</ion-content>

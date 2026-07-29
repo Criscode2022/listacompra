@@ -2,7 +2,18 @@
   publish = "www"
   command = "npm run build"
 
-# SPA redirect — send all routes to index.html for Angular routing
+[[redirects]]
+  from = "/__neon-auth/*"
+  to = "https://ep-flat-cherry-afhkqmmq.neonauth.c-2.us-west-2.aws.neon.tech/neondb/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/__neon-data/*"
+  to = "https://ep-flat-cherry-afhkqmmq.apirest.c-2.us-west-2.aws.neon.tech/neondb/rest/v1/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

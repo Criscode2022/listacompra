@@ -11,6 +11,78 @@
 
 <ion-content class="settings-content">
 
+  <!-- Cloud section -->
+  <div class="settings-section">
+    <p class="section-title">Nube</p>
+    <div class="settings-card online-card" [class.active]="onlineActive">
+      <ng-container *ngIf="onlineActive">
+        <div class="online-status-block">
+          <div class="row-icon" style="--row-icon-color: #007aff">
+            <ion-icon name="cloud-done-outline"></ion-icon>
+          </div>
+          <div class="row-text">
+            <span class="row-label">Modo nube activo</span>
+            <span class="row-sublabel">Tus cambios se sincronizan automáticamente</span>
+          </div>
+        </div>
+
+        <div class="online-user" *ngIf="onlineUser">
+          <ion-icon name="person-circle-outline" color="success"></ion-icon>
+          <div>
+            <strong>{{ onlineUser.email }}</strong>
+            <p>Sesión iniciada</p>
+          </div>
+        </div>
+
+        <button
+          class="settings-row signout-row"
+          (click)="signOutOnline()"
+          [disabled]="switchingMode"
+        >
+          <div class="row-icon" style="--row-icon-color: #8e8e93">
+            <ion-icon name="log-out-outline"></ion-icon>
+          </div>
+          <span class="row-label">Cerrar sesión en la nube</span>
+          <ion-icon name="chevron-forward-outline" class="row-chevron"></ion-icon>
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="!onlineActive">
+        <div class="settings-row non-interactive">
+          <div class="row-icon" style="--row-icon-color: #007aff">
+            <ion-icon name="cloud-outline"></ion-icon>
+          </div>
+          <div class="row-text">
+            <span class="row-label">Modo nube</span>
+            <span class="row-sublabel">Sincroniza entre dispositivos</span>
+          </div>
+          <ion-toggle
+            [checked]="onlineMode"
+            (ionChange)="onOnlineModeChange($event)"
+            [disabled]="switchingMode"
+          ></ion-toggle>
+        </div>
+
+        <div class="pending-block" *ngIf="onlinePending">
+          <div class="online-user pending">
+            <ion-icon name="time-outline" color="warning"></ion-icon>
+            <div>
+              <strong>Inicia sesión para continuar</strong>
+              <p>Activa la nube creando una cuenta o iniciando sesión.</p>
+            </div>
+          </div>
+          <button class="settings-row auth-row" (click)="goToAuth()">
+            <div class="row-icon" style="--row-icon-color: #007aff">
+              <ion-icon name="log-in-outline"></ion-icon>
+            </div>
+            <span class="row-label">Ir a iniciar sesión</span>
+            <ion-icon name="chevron-forward-outline" class="row-chevron"></ion-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
   <!-- Data section -->
   <div class="settings-section">
     <p class="section-title">Datos</p>

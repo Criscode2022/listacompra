@@ -1,12 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   AlertController,
   IonicModule,
   ModalController,
   ToastController,
 } from '@ionic/angular';
+import { AppModeService } from '../core/services/app-mode/app-mode.service';
 import { DataService } from '../core/services/data-service/data.service';
+import { AuthUser, NeonService } from '../core/services/neon/neon.service';
 import { Product } from '../core/types/product';
 
 @Component({
@@ -14,13 +22,20 @@ import { Product } from '../core/types/product';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, FormsModule, IonicModule],
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
+  private appMode = inject(AppModeService);
+  private neon = inject(NeonService);
+  private cdr = inject(ChangeDetectorRef);
   protected dataService = inject(DataService);
+
+  protected onlineMode = false;
+  protected onlineUser: AuthUser | null = null;
+  protected switchingMode = false;
 
   private get isDesktop(): boolean {
     return (
@@ -29,8 +44,104 @@ export class SettingsComponent {
     );
   }
 
+  ngOnInit(): void {
+    this.onlineMode = this.appMode.isOnline() || this.appMode.hasOnlineIntent();
+    void this.loadOnlineUser();
+  }
+
+  protected get onlineActive(): boolean {
+    return this.appMode.isOnline();
+  }
+
+  protected get onlinePending(): boolean {
+    return this.appMode.hasOnlineIntent();
+  }
+
+  private async loadOnlineUser(): Promise<void> {
+    this.onlineUser = this.appMode.isOnline()
+      ? await this.neon.getUser()
+      : null;
+    this.cdr.detectChanges();
+  }
+
   protected close() {
     this.modalCtrl.dismiss();
+  }
+
+  protected async goToAuth(): Promise<void> {
+    this.appMode.setOnlineIntent();
+    this.onlineMode = true;
+    await this.modalCtrl.dismiss(undefined, 'auth');
+  }
+
+  protected async onOnlineModeChange(event: CustomEvent): Promise<void> {
+    const enabled = event.detail.checked;
+
+    if (enabled) {
+      this.appMode.setOnlineIntent();
+      const session = await this.neon.getSession();
+      if (session) {
+        this.appMode.enableOnlineMode();
+        this.onlineMode = true;
+        this.onlineUser = await this.neon.getUser();
+        this.cdr.detectChanges();
+        await this.showStatusToast('Modo nube activado', false);
+      } else {
+        await this.goToAuth();
+      }
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Desactivar modo nube',
+      message:
+        'Se cerrará tu sesión en la nube. Tus productos seguirán guardados en este dispositivo.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            this.onlineMode = true;
+          },
+        },
+        {
+          text: 'Desactivar',
+          handler: () => void this.disableOnlineMode(),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  protected async signOutOnline(): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message:
+        'Se desactivará la sincronización en la nube. Tus productos locales no se borrarán.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          handler: () => void this.disableOnlineMode(),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async disableOnlineMode(): Promise<void> {
+    this.switchingMode = true;
+    try {
+      await this.neon.signOut();
+      this.appMode.disableOnlineMode();
+      this.onlineMode = false;
+      this.onlineUser = null;
+      this.cdr.detectChanges();
+      await this.showStatusToast('Modo nube desactivado', false, 'medium');
+    } finally {
+      this.switchingMode = false;
+      this.cdr.detectChanges();
+    }
   }
 
   protected async clearAllData() {
@@ -78,7 +189,7 @@ export class SettingsComponent {
         const data = JSON.parse(text);
         if (!Array.isArray(data)) throw new Error('not-array');
         const migrated: Product[] = data
-          .map((p: any) => ({
+          .map((p: Product) => ({
             name: String(p.name ?? '').trim(),
             checked: Boolean(p.checked ?? false),
             quantity: Number(p.quantity ?? 1),
@@ -103,6 +214,20 @@ export class SettingsComponent {
       }
     };
     input.click();
+  }
+
+  private async showStatusToast(
+    message: string,
+    isError = false,
+    color: 'success' | 'danger' | 'medium' = 'success',
+  ) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      position: 'bottom',
+      color: isError ? 'danger' : color,
+    });
+    await toast.present();
   }
 
   private async showToast(

@@ -1,0 +1,126 @@
+// ─── Liquid Glass + Apple Surface Design Tokens ───
+// Shared tokens for chrome (tab bar, header, FAB, modal) and content surfaces.
+
+:root {
+  /* Apple system palette */
+  --apple-blue: #007aff;
+  --apple-blue-rgb: 0, 122, 255;
+  --apple-green: #34c759;
+  --apple-red: #ff3b30;
+  --apple-orange: #ff9500;
+  --apple-purple: #5856d6;
+  --apple-pink: #ff2d55;
+  --apple-teal: #5ac8fa;
+  --apple-indigo: #5856d6;
+
+  --apple-label: #1c1c1e;
+  --apple-secondary-label: rgba(60, 60, 67, 0.6);
+  --apple-tertiary-label: rgba(60, 60, 67, 0.45);
+  --apple-separator: rgba(60, 60, 67, 0.12);
+  --apple-fill: rgba(120, 120, 128, 0.12);
+  --apple-fill-secondary: rgba(120, 120, 128, 0.08);
+  --apple-grouped-bg: #f2f2f7;
+  --apple-secondary-grouped: #ffffff;
+
+  /* Ionic overrides toward Apple */
+  --ion-color-primary: #007aff;
+  --ion-color-primary-rgb: 0, 122, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0062cc;
+  --ion-color-primary-tint: #1a87ff;
+
+  --ion-background-color: #f2f2f7;
+  --ion-background-color-rgb: 242, 242, 247;
+  --ion-text-color: #1c1c1e;
+  --ion-text-color-rgb: 28, 28, 30;
+  --ion-toolbar-background: transparent;
+  --ion-toolbar-color: #1c1c1e;
+  --ion-item-background: transparent;
+  --ion-card-background: #ffffff;
+  --ion-tab-bar-background: transparent !important;
+
+  /* Glass material */
+  --glass-bg: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(255, 255, 255, 0.28) 35%,
+    rgba(210, 225, 255, 0.22) 55%,
+    rgba(255, 255, 255, 0.18) 75%,
+    rgba(245, 245, 255, 0.42) 100%
+  );
+  --glass-bg-solid: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.58);
+  --glass-border-soft: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(28px) saturate(180%) brightness(1.04);
+  --glass-blur-strong: blur(40px) saturate(200%) brightness(1.05);
+  --glass-shadow:
+    0 8px 32px rgba(100, 120, 200, 0.12),
+    0 2px 10px rgba(100, 120, 200, 0.08),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.78),
+    inset 0 -1px 3px rgba(100, 120, 180, 0.06);
+  --glass-shadow-raised:
+    0 12px 40px rgba(100, 120, 200, 0.18),
+    0 4px 14px rgba(100, 120, 200, 0.1),
+    inset 0 2px 3px rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(100, 120, 180, 0.08);
+
+  /* Content card surfaces */
+  --surface-card: rgba(255, 255, 255, 0.92);
+  --surface-card-border: rgba(255, 255, 255, 0.7);
+  --surface-card-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  --surface-radius: 14px;
+  --surface-radius-lg: 18px;
+  --surface-radius-pill: 9999px;
+  --control-radius: 12px;
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.18s;
+  --duration-med: 0.28s;
+  --press-scale: 0.96;
+}
+
+@mixin liquid-glass($blur: var(--glass-blur), $radius: var(--surface-radius-lg)) {
+  background: var(--glass-bg);
+  backdrop-filter: #{$blur};
+  -webkit-backdrop-filter: #{$blur};
+  border: 1px solid var(--glass-border);
+  border-radius: $radius;
+  box-shadow: var(--glass-shadow);
+}
+
+@mixin glass-chrome {
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 0.5px solid var(--apple-separator);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+@mixin apple-card {
+  background: var(--surface-card);
+  border-radius: var(--surface-radius);
+  border: 0.5px solid var(--surface-card-border);
+  box-shadow: var(--surface-card-shadow);
+  overflow: hidden;
+}
+
+@mixin pressable {
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    opacity var(--duration-fast) ease,
+    background var(--duration-med) var(--ease-spring),
+    box-shadow var(--duration-med) var(--ease-spring),
+    border-color var(--duration-med) ease;
+
+  &:active {
+    transform: scale(var(--press-scale));
+  }
+}

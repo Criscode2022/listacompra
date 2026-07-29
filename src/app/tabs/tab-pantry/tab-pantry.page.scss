@@ -12,16 +12,17 @@
 
 /* ─── Product Items ─── */
 .product-list {
-  @apply pb-3;
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 0 12px 100px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+  background: transparent;
 }
 
 .product-list ion-item-sliding {
   width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -34,44 +35,61 @@
 }
 
 .product-item {
-  @apply cursor-pointer;
+  cursor: pointer;
 }
 
 .category-dot {
-  box-shadow: 0 0 6px
-    color-mix(in srgb, var(--cat-color, #888) 40%, transparent);
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 0 8px color-mix(in srgb, var(--cat-color, #888) 40%, transparent);
 }
 
 .quantity-badge {
-  @apply inline-flex items-center justify-center min-w-11 py-1.5 px-2.5 text-[13px] font-bold rounded-xl cursor-pointer;
-  color: #333;
-  background: #f1f3f5;
-  border: 1.5px solid #dee2e6;
-  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #1c1c1e;
+  background: rgba(120, 120, 128, 0.12);
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  transition:
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease,
+    border-color 0.2s ease;
   margin: 4px 8px 4px 0;
 
   &:hover {
-    background: #e2e6ea;
-    border-color: #adb5bd;
-    color: #111;
+    background: rgba(120, 120, 128, 0.18);
+    border-color: rgba(60, 60, 67, 0.14);
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.94);
   }
 }
 
 .desktop-delete-button {
-  @apply inline-flex items-center justify-center rounded-full p-0 cursor-pointer;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  border: 1.5px solid #fa5252;
-  background: #ffe3e3;
-  color: #e03131;
-  margin: 0 18px 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border: 1px solid rgba(255, 59, 48, 0.25);
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  margin: 0 14px 0 4px;
   transition:
-    transform 0.18s ease,
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.18s ease;
 
   &.quantity-hidden {
@@ -80,14 +98,14 @@
   }
 
   ion-icon {
-    @apply text-[13px];
+    font-size: 13px;
   }
 
   &:hover {
-    background: #ffc9c9;
+    background: rgba(255, 59, 48, 0.16);
   }
 
   &:active {
-    transform: scale(0.92);
+    transform: scale(0.9);
   }
 }

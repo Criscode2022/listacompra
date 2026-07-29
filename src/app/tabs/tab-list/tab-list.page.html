@@ -47,10 +47,10 @@
   </div>
 
   <ng-container *ngIf="pendingProducts().length; else emptyOrNoMatch">
-    <ion-list class="shopping-list">
+    <ion-list class="shopping-list" lines="none">
       <ng-container *ngFor="let product of pendingProducts()">
         <ng-container *ngIf="!product.checked">
-          <ion-item class="shopping-item">
+          <ion-item class="shopping-item" lines="none">
             <div
               *ngIf="!dataService.basicMode()"
               class="category-dot"

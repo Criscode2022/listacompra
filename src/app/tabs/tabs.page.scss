@@ -2,32 +2,27 @@
 
 :host {
   ion-tab-bar.liquid-glass-bar {
-    /* Heavy frosted glass blur */
-    background: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.12) 30%,
-      rgba(200, 220, 255, 0.18) 50%,
-      rgba(255, 255, 255, 0.10) 70%,
-      rgba(240, 240, 255, 0.35) 100%
+    /* Heavy frosted glass blur — uses shared theme tokens when present */
+    background: var(
+      --glass-bg,
+      linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.12) 30%,
+        rgba(200, 220, 255, 0.18) 50%,
+        rgba(255, 255, 255, 0.1) 70%,
+        rgba(240, 240, 255, 0.35) 100%
+      )
     ) !important;
-    backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
-    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.05);
+    backdrop-filter: var(--glass-blur-strong, blur(40px) saturate(200%) brightness(1.05));
+    -webkit-backdrop-filter: var(
+      --glass-blur-strong,
+      blur(40px) saturate(200%) brightness(1.05)
+    );
 
-    /* Glass border with chromatic / rainbow refraction edge */
-    border: 1.5px solid transparent;
-    border-image: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.70),
-      rgba(180, 200, 255, 0.40),
-      rgba(200, 180, 255, 0.35),
-      rgba(255, 200, 220, 0.30),
-      rgba(255, 255, 255, 0.60)
-    ) 1;
-    border-radius: 9999px;
-    /* border-image breaks border-radius, so we use outline + clip instead */
-    border-image: none;
-    border-color: rgba(255, 255, 255, 0.55);
+    border: 1.5px solid var(--glass-border, rgba(255, 255, 255, 0.55));
+    border-radius: var(--surface-radius-pill, 9999px);
+    border-color: var(--glass-border, rgba(255, 255, 255, 0.55));
 
     /* Layered shadows for liquid depth */
     box-shadow:

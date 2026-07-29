@@ -24,38 +24,195 @@
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 
-/* ─── Modern Font ─── */
+/* ─── Modern system-first type ─── */
 * {
   font-family:
-    "Inter",
-    "Roboto",
     -apple-system,
     BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    "Inter",
+    "Roboto",
     sans-serif;
 }
 
 .empty {
   @apply m-5 text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold;
+  color: var(--apple-secondary-label, rgba(60, 60, 67, 0.6));
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+
+  a {
+    color: var(--apple-blue, #007aff);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
 }
 
-:root {
-  --ion-tab-bar-background: transparent !important; /* Transparent for liquid glass effect */
+/* ─── App canvas ─── */
+ion-content {
+  --background: var(--apple-grouped-bg, #f2f2f7);
 }
 
-/* Consistent row height across all tabs */
+ion-app,
+ion-router-outlet {
+  background: var(--apple-grouped-bg, #f2f2f7);
+}
+
+/* ─── Glass page headers (app-header chrome) ─── */
+app-header ion-header {
+  &::after {
+    display: none;
+  }
+}
+
+app-header ion-toolbar {
+  --background: rgba(255, 255, 255, 0.72);
+  --border-width: 0;
+  --color: var(--apple-label, #1c1c1e);
+  --min-height: 52px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 0.5px solid var(--apple-separator, rgba(60, 60, 67, 0.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 4px 18px rgba(0, 0, 0, 0.04);
+
+  ion-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  ion-icon[slot='start'],
+  ion-icon.ion-margin {
+    color: var(--apple-blue, #007aff);
+    opacity: 0.95;
+  }
+
+  ion-button {
+    --border-radius: 9999px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.18s ease;
+
+    &:active {
+      transform: scale(0.92);
+      opacity: 0.85;
+    }
+  }
+}
+
+/* When header uses color="primary" / danger, keep translucent glass tint */
+app-header ion-toolbar.ion-color-primary {
+  --background: rgba(0, 122, 255, 0.12);
+  --color: var(--apple-blue, #007aff);
+  --ion-color-base: transparent !important;
+  --ion-color-contrast: var(--apple-blue, #007aff) !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+app-header ion-toolbar.ion-color-danger {
+  --background: rgba(255, 59, 48, 0.1);
+  --color: var(--apple-red, #ff3b30);
+  --ion-color-base: transparent !important;
+  --ion-color-contrast: var(--apple-red, #ff3b30) !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+/* Consistent product row geometry */
 ion-item {
   --min-height: 60px;
   --max-height: 60px;
   height: 60px;
 }
 
-/* ─── Add Product Modal ─── */
+/* Product rows as rounded Apple cards (kill Ionic hairline so edges don't double) */
+.product-list,
+.shopping-list,
+.urgent-list {
+  background: transparent;
+  --ion-item-border-color: transparent;
+}
+
+.product-list ion-item.product-item,
+.shopping-list ion-item.shopping-item,
+.urgent-list ion-item.urgent-item {
+  --background: rgba(255, 255, 255, 0.92);
+  --background-activated: rgba(255, 255, 255, 0.92);
+  --border-radius: 14px;
+  --border-width: 0;
+  --border-style: none;
+  --inner-border-width: 0;
+  --inner-border-style: none;
+  --padding-start: 14px;
+  --padding-end: 12px;
+  --inner-padding-end: 8px;
+  --highlight-background: rgba(0, 122, 255, 0.06);
+  --highlight-height: 0;
+  --ripple-color: rgba(0, 122, 255, 0.12);
+  --detail-icon-opacity: 0;
+  margin: 0;
+  border: none;
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 14px rgba(0, 0, 0, 0.035);
+  overflow: hidden;
+  transition:
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease;
+
+  /* Single surface: native fills host; no second bottom edge */
+  &::part(native) {
+    border-radius: 14px;
+    border-width: 0;
+    border-style: none;
+    border-color: transparent;
+    box-shadow: none;
+    margin: 0;
+  }
+
+  &:active {
+    transform: scale(0.985);
+  }
+}
+
+.product-list ion-item-sliding {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ─── Add Product Modal (glass sheet) ─── */
 .add-product-modal {
   --border-radius: 20px;
-  --box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  --box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 0 0 0.5px rgba(255, 255, 255, 0.4);
+  --background: transparent;
 
   &::part(content) {
     border-radius: 20px;
+    overflow: hidden;
+    background: rgba(248, 248, 252, 0.92);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
   @media (min-width: 768px) {
@@ -69,6 +226,28 @@ ion-item {
   }
 }
 
+/* Settings / glass bottom sheets */
+ion-modal.glass-sheet::part(content),
+ion-modal.settings-sheet::part(content) {
+  border-radius: 18px 18px 0 0;
+  background: rgba(242, 242, 247, 0.92);
+  backdrop-filter: blur(36px) saturate(180%);
+  -webkit-backdrop-filter: blur(36px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: none;
+  box-shadow:
+    0 -8px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+ion-modal.glass-sheet::part(handle),
+ion-modal.settings-sheet::part(handle) {
+  background: rgba(60, 60, 67, 0.28);
+  width: 36px;
+  height: 5px;
+  border-radius: 9999px;
+}
+
 /* ─── Modern Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 5px;
@@ -79,10 +258,20 @@ ion-item {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(120, 120, 128, 0.35);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: rgba(120, 120, 128, 0.5);
+}
+
+/* ─── Focus rings for keyboard users ─── */
+:focus-visible {
+  outline: 2px solid rgba(0, 122, 255, 0.55);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
 }

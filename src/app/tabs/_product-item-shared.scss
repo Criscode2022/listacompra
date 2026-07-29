@@ -1,27 +1,52 @@
 @mixin product-item-shared($list-class, $item-class, $meta-gap: 6px) {
   .#{$list-class} {
-    @apply bg-transparent;
+    background: transparent;
+    padding: 0 12px 100px;
   }
 
   .#{$item-class} {
-    --padding-start: 12px;
+    --padding-start: 14px;
+    --background: rgba(255, 255, 255, 0.92);
+    --border-radius: 14px;
+    --border-width: 0;
+    --inner-border-width: 0;
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
   }
 
   .category-dot {
-    @apply w-2.5 h-2.5 rounded-full shrink-0 mr-1;
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    margin-right: 4px;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
   }
 
   .product-label {
     h3.product-name {
-      @apply text-[15px] font-semibold text-[#1a1a2e] m-0 whitespace-nowrap overflow-hidden text-ellipsis;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: #1c1c1e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     p.product-meta {
-      @apply flex items-center text-xs text-[#888] mt-0.5;
+      display: flex;
+      align-items: center;
+      margin-top: 2px;
+      font-size: 12px;
+      color: rgba(60, 60, 67, 0.55);
       gap: $meta-gap;
 
       .meta-icon {
-        @apply text-[13px];
+        font-size: 13px;
+        opacity: 0.85;
       }
     }
   }

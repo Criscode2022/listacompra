@@ -10,12 +10,20 @@
   6px
 );
 
+.urgent-list {
+  background: transparent;
+  padding: 0 4px 100px;
+  display: grid;
+  gap: 8px;
+}
+
 /* ─── Urgent Product Items ─── */
 .quantity-tag {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-weight: 650;
   font-size: 11px;
-  background: #fee2e5;
-  color: #e64980;
+  letter-spacing: -0.01em;
+  background: rgba(255, 45, 85, 0.12);
+  color: #ff2d55;
 }
