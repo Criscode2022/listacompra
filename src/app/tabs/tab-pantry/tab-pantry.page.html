@@ -1,8 +1,4 @@
-<app-header
-  title="Despensa"
-  icon="home"
-  [deleteButtonInvisible]="false"
-></app-header>
+<app-header title="Despensa" icon="home"></app-header>
 
 <ion-content>
   <!-- Category Filter Bar -->
@@ -94,8 +90,7 @@
               (click)="editQuantity(product.name, product.quantity)"
               appStopPropagation
             >
-              {{ product.quantity }}{{ product.unit !== 'ud' ? product.unit :
-              'x' }}
+              {{ product.quantity }}<span class="quantity-unit">{{ product.unit }}</span>
             </span>
             <ion-toggle
               slot="end"

@@ -61,7 +61,8 @@
               <h3 class="product-name">{{ product.name }}</h3>
               <p class="product-meta">
                 <span class="quantity-tag"
-                  >{{ product.quantity }}{{ product.unit }}</span
+                  >{{ product.quantity
+                  }}<span class="quantity-unit">{{ product.unit }}</span></span
                 >
                 <ion-icon
                   *ngIf="!dataService.basicMode()"
