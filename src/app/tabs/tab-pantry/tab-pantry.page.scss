@@ -34,6 +34,14 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .product-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 12px;
+  }
+}
+
 .product-item {
   cursor: pointer;
 }

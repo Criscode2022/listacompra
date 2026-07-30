@@ -60,6 +60,21 @@ ion-content {
   --background: var(--apple-grouped-bg, #f2f2f7);
 }
 
+/* Center the scrollable column on wider viewports instead of letting rows
+   stretch edge-to-edge; keep in sync with the toolbar insets below. */
+@media (min-width: 768px) {
+  ion-content::part(scroll) {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  ion-content::part(scroll) {
+    max-width: 1120px;
+  }
+}
+
 ion-app,
 ion-router-outlet {
   background: var(--apple-grouped-bg, #f2f2f7);
@@ -107,6 +122,18 @@ app-header ion-toolbar {
       transform: scale(0.92);
       opacity: 0.85;
     }
+  }
+
+  /* Inset the toolbar content so it lines up with the centered scroll
+     column above (max-widths must match the ion-content rules). */
+  @media (min-width: 768px) {
+    --padding-start: max(16px, calc((100vw - 760px) / 2));
+    --padding-end: max(16px, calc((100vw - 760px) / 2));
+  }
+
+  @media (min-width: 1024px) {
+    --padding-start: max(24px, calc((100vw - 1120px) / 2));
+    --padding-end: max(24px, calc((100vw - 1120px) / 2));
   }
 }
 
