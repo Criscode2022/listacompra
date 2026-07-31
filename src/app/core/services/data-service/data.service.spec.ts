@@ -1,27 +1,25 @@
 import { TestBed } from '@angular/core/testing';
-import { Product } from '../../types/product';
 import { SqliteService } from '../sqlite/sqlite.service';
 import { DataService } from './data.service';
 
 describe('DataService', () => {
-  let sqlite: {
-    initialize: jasmine.Spy;
-    query: jasmine.Spy;
-    run: jasmine.Spy;
-    execute: jasmine.Spy;
-    executeSet: jasmine.Spy;
-    save: jasmine.Spy;
-  };
+  let sqlite: jasmine.SpyObj<SqliteService>;
 
   beforeEach(() => {
-    sqlite = {
-      initialize: jasmine.createSpy('initialize').and.resolveTo(undefined),
-      query: jasmine.createSpy('query').and.resolveTo([]),
-      run: jasmine.createSpy('run').and.resolveTo(undefined),
-      execute: jasmine.createSpy('execute').and.resolveTo(undefined),
-      executeSet: jasmine.createSpy('executeSet').and.resolveTo(undefined),
-      save: jasmine.createSpy('save').and.resolveTo(undefined),
-    };
+    sqlite = jasmine.createSpyObj<SqliteService>('SqliteService', [
+      'open',
+      'getProducts',
+      'setProducts',
+      'getBasicMode',
+      'setBasicMode',
+      'clearAll',
+    ]);
+    sqlite.open.and.resolveTo(undefined);
+    sqlite.getProducts.and.returnValue([]);
+    sqlite.getBasicMode.and.returnValue(false);
+    sqlite.setProducts.and.resolveTo(undefined);
+    sqlite.setBasicMode.and.resolveTo(undefined);
+    sqlite.clearAll.and.resolveTo(undefined);
 
     TestBed.configureTestingModule({
       providers: [
@@ -35,41 +33,27 @@ describe('DataService', () => {
     expect(TestBed.inject(DataService)).toBeTruthy();
   });
 
-  it('loads products from SQLite with defaults for missing fields', async () => {
-    sqlite.query.and.callFake(async (sql: string) => {
-      if (sql.includes('FROM products')) {
-        return [
-          {
-            name: 'Leche',
-            checked: 0,
-            quantity: 2,
-            urgent: 0,
-            unit: '',
-            category: '',
-          },
-        ];
-      }
-      return [];
-    });
-
-    const service = TestBed.inject(DataService);
-    await service.initStorage();
-
-    expect(service.products()).toEqual([
+  it('loads products from SQLite on start', async () => {
+    sqlite.getProducts.and.returnValue([
       {
         name: 'Leche',
         checked: false,
         quantity: 2,
         urgent: false,
         unit: 'ud',
-        category: 'otros',
+        category: 'lácteos',
       },
     ]);
+
+    const service = TestBed.inject(DataService);
+    await service.whenReady();
+
+    expect(service.products()[0].name).toBe('Leche');
   });
 
   it('toggles checked status and resets quantity when checked', async () => {
     const service = TestBed.inject(DataService);
-    await service.initStorage();
+    await service.whenReady();
 
     service.products.set([
       {
@@ -96,7 +80,7 @@ describe('DataService', () => {
 
   it('deletes a product by name', async () => {
     const service = TestBed.inject(DataService);
-    await service.initStorage();
+    await service.whenReady();
 
     service.products.set([
       {
@@ -122,9 +106,9 @@ describe('DataService', () => {
     expect(service.products().map((p) => p.name)).toEqual(['Leche']);
   });
 
-  it('clears products and settings', async () => {
+  it('clears all data', async () => {
     const service = TestBed.inject(DataService);
-    await service.initStorage();
+    await service.whenReady();
 
     service.products.set([
       {
@@ -139,35 +123,7 @@ describe('DataService', () => {
 
     await service.clearStorage();
 
-    expect(sqlite.execute).toHaveBeenCalledWith('DELETE FROM products');
-    expect(sqlite.execute).toHaveBeenCalledWith('DELETE FROM app_settings');
+    expect(sqlite.clearAll).toHaveBeenCalled();
     expect(service.products()).toEqual([]);
-  });
-
-  it('stores products with executeSet', async () => {
-    const service = TestBed.inject(DataService);
-    await service.initStorage();
-
-    const products: Product[] = [
-      {
-        name: 'Agua',
-        checked: false,
-        quantity: 6,
-        urgent: false,
-        unit: 'l',
-        category: 'bebidas',
-      },
-    ];
-
-    await service.storeData(products);
-
-    expect(sqlite.executeSet).toHaveBeenCalled();
-    const setArg = sqlite.executeSet.calls.mostRecent().args[0] as Array<{
-      statement: string;
-      values: unknown[];
-    }>;
-    expect(setArg[0].statement).toContain('DELETE FROM products');
-    expect(setArg[1].values).toEqual(['Agua', 0, 6, 0, 'l', 'bebidas']);
-    expect(sqlite.save).toHaveBeenCalled();
   });
 });

@@ -1,73 +1,108 @@
 import { Injectable } from '@angular/core';
 import type { Database, SqlJsStatic, SqlValue } from 'sql.js';
+import { MeasureUnit, Product, ProductCategory } from '../../types/product';
 
-/** SQLite (sql.js WASM) persisted as a binary blob in IndexedDB. */
+/**
+ * Tiny SQLite wrapper for this app.
+ *
+ * How it works (3 steps):
+ * 1. Load sql.js (SQLite compiled to WebAssembly) from /assets
+ * 2. Open a database in memory (or restore the last saved file from IndexedDB)
+ * 3. After each change, export the whole DB file and save it in IndexedDB
+ *
+ * See docs/SQLITE.md for a longer explanation.
+ */
 
-const IDB_NAME = 'listacompra-sqlite-v1';
-const IDB_STORE = 'databases';
-const IDB_KEY = 'main';
-
-export interface SqlStatement {
-  statement: string;
-  values?: unknown[];
-}
-
-const SCHEMA_SQL = `
-CREATE TABLE IF NOT EXISTS products (
-  name TEXT PRIMARY KEY NOT NULL,
-  checked INTEGER NOT NULL DEFAULT 0,
-  quantity REAL NOT NULL DEFAULT 1,
-  urgent INTEGER NOT NULL DEFAULT 0,
-  unit TEXT NOT NULL DEFAULT 'ud',
-  category TEXT NOT NULL DEFAULT 'otros'
-);
-CREATE TABLE IF NOT EXISTS app_settings (
-  key TEXT PRIMARY KEY NOT NULL,
-  value TEXT NOT NULL
-);
-`;
-
-type InitSqlJsFn = (config?: {
-  locateFile?: (file: string) => string;
-}) => Promise<SqlJsStatic>;
-
-function getInitSqlJs(): InitSqlJsFn | undefined {
-  const fn = (window as unknown as { initSqlJs?: InitSqlJsFn }).initSqlJs;
-  return typeof fn === 'function' ? fn : undefined;
-}
-
-function assetUrl(file: string): string {
-  try {
-    return new URL(`assets/${file}`, document.baseURI).href;
-  } catch {
-    return `assets/${file}`;
-  }
-}
+const DB_FILE_KEY = 'listacompra.sqlite';
 
 @Injectable({ providedIn: 'root' })
 export class SqliteService {
-  private SQL: SqlJsStatic | null = null;
+  private sql: SqlJsStatic | null = null;
   private db: Database | null = null;
-  private initPromise: Promise<void> | null = null;
+  private opening: Promise<void> | null = null;
 
-  initialize(): Promise<void> {
-    if (!this.initPromise) {
-      this.initPromise = this.doInitialize().catch((err) => {
-        this.initPromise = null;
-        throw err;
-      });
+  /** Open the database (safe to call more than once). */
+  open(): Promise<void> {
+    if (!this.opening) {
+      this.opening = this.openOnce();
     }
-    return this.initPromise;
+    return this.opening;
   }
 
-  async query(
-    statement: string,
-    values: unknown[] = [],
-  ): Promise<Record<string, unknown>[]> {
-    const db = this.requireDb();
-    const stmt = db.prepare(statement);
+  /** Read all products. */
+  getProducts(): Product[] {
+    const rows = this.select(
+      'SELECT name, checked, quantity, urgent, unit, category FROM products ORDER BY name COLLATE NOCASE',
+    );
+
+    return rows.map((row) => ({
+      name: String(row['name'] ?? ''),
+      checked: Number(row['checked']) === 1,
+      quantity: Number(row['quantity'] ?? 1) || 1,
+      urgent: Number(row['urgent']) === 1,
+      unit: (row['unit'] as MeasureUnit) || 'ud',
+      category: (row['category'] as ProductCategory) || 'otros',
+    }));
+  }
+
+  /** Replace the full product list and save. */
+  async setProducts(products: Product[]): Promise<void> {
+    const db = this.database();
+    db.run('DELETE FROM products');
+
+    for (const p of products) {
+      db.run(
+        'INSERT INTO products (name, checked, quantity, urgent, unit, category) VALUES (?, ?, ?, ?, ?, ?)',
+        [
+          p.name,
+          p.checked ? 1 : 0,
+          Number(p.quantity) || 1,
+          p.urgent ? 1 : 0,
+          p.unit || 'ud',
+          p.category || 'otros',
+        ],
+      );
+    }
+
+    await this.save();
+  }
+
+  getBasicMode(): boolean {
+    const rows = this.select(
+      "SELECT value FROM app_settings WHERE key = 'basicMode'",
+    );
+    if (!rows.length) return false;
+    return String(rows[0]['value']) === 'true';
+  }
+
+  async setBasicMode(enabled: boolean): Promise<void> {
+    this.database().run(
+      "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('basicMode', ?)",
+      [enabled ? 'true' : 'false'],
+    );
+    await this.save();
+  }
+
+  async clearAll(): Promise<void> {
+    const db = this.database();
+    db.run('DELETE FROM products');
+    db.run('DELETE FROM app_settings');
+    await this.save();
+  }
+
+  // ── private helpers ──────────────────────────────────────────────
+
+  private database(): Database {
+    if (!this.db) {
+      throw new Error('Database not open. Call open() first.');
+    }
+    return this.db;
+  }
+
+  private select(sql: string, params: SqlValue[] = []): Record<string, unknown>[] {
+    const stmt = this.database().prepare(sql);
     try {
-      if (values.length) stmt.bind(values as SqlValue[]);
+      if (params.length) stmt.bind(params);
       const rows: Record<string, unknown>[] = [];
       while (stmt.step()) {
         rows.push(stmt.getAsObject() as Record<string, unknown>);
@@ -78,115 +113,102 @@ export class SqliteService {
     }
   }
 
-  async run(statement: string, values: unknown[] = []): Promise<void> {
-    const db = this.requireDb();
-    if (values.length) db.run(statement, values as SqlValue[]);
-    else db.run(statement);
-  }
+  private async openOnce(): Promise<void> {
+    this.sql = await this.loadSqlJs();
 
-  async execute(statements: string): Promise<void> {
-    this.requireDb().run(statements);
-  }
+    // Restore previous DB file if we have one
+    const saved = await this.readFile();
+    this.db = saved
+      ? new this.sql.Database(saved)
+      : new this.sql.Database();
 
-  async executeSet(set: SqlStatement[]): Promise<void> {
-    const db = this.requireDb();
-    db.run('BEGIN');
-    try {
-      for (const item of set) {
-        const values = item.values ?? [];
-        if (values.length) db.run(item.statement, values as SqlValue[]);
-        else db.run(item.statement);
-      }
-      db.run('COMMIT');
-    } catch (err) {
-      try {
-        db.run('ROLLBACK');
-      } catch {
-        // ignore
-      }
-      throw err;
-    }
-  }
+    // Create tables if they do not exist yet
+    this.db.run(`
+      CREATE TABLE IF NOT EXISTS products (
+        name TEXT PRIMARY KEY NOT NULL,
+        checked INTEGER NOT NULL DEFAULT 0,
+        quantity REAL NOT NULL DEFAULT 1,
+        urgent INTEGER NOT NULL DEFAULT 0,
+        unit TEXT NOT NULL DEFAULT 'ud',
+        category TEXT NOT NULL DEFAULT 'otros'
+      );
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY NOT NULL,
+        value TEXT NOT NULL
+      );
+    `);
 
-  /** Persist the in-memory SQLite DB to IndexedDB. */
-  async save(): Promise<void> {
-    if (!this.db) return;
-    const data = this.db.export();
-    await this.savePersistedDb(data);
-  }
-
-  private requireDb(): Database {
-    if (!this.db) throw new Error('SQLite database is not initialized');
-    return this.db;
-  }
-
-  private async doInitialize(): Promise<void> {
-    this.SQL = await this.loadSqlJs();
-    const existing = await this.loadPersistedDb();
-    this.db = existing
-      ? new this.SQL.Database(existing)
-      : new this.SQL.Database();
-    this.db.run(SCHEMA_SQL);
     await this.save();
   }
 
-  private loadSqlJs(): Promise<SqlJsStatic> {
-    const boot = (initSqlJs: InitSqlJsFn) =>
-      initSqlJs({ locateFile: (file) => assetUrl(file) });
+  /** Write the in-memory SQLite file into IndexedDB. */
+  private async save(): Promise<void> {
+    if (!this.db) return;
+    await this.writeFile(this.db.export());
+  }
 
-    const existing = getInitSqlJs();
-    if (existing) return boot(existing);
+  /** Load sql.js from /assets (not via webpack). */
+  private loadSqlJs(): Promise<SqlJsStatic> {
+    const wasmFolder = new URL('assets/', document.baseURI).href;
+
+    type InitFn = (cfg: {
+      locateFile: (f: string) => string;
+    }) => Promise<SqlJsStatic>;
+
+    const start = (initSqlJs: InitFn) =>
+      initSqlJs({ locateFile: (file) => wasmFolder + file });
+
+    const fromWindow = (window as unknown as { initSqlJs?: InitFn }).initSqlJs;
+    if (typeof fromWindow === 'function') {
+      return start(fromWindow);
+    }
 
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = assetUrl('sql-wasm.js');
-      script.async = true;
+      script.src = wasmFolder + 'sql-wasm.js';
       script.onload = () => {
-        const initSqlJs = getInitSqlJs();
-        if (!initSqlJs) {
-          reject(new Error('initSqlJs not available after script load'));
+        const initSqlJs = (window as unknown as { initSqlJs?: InitFn })
+          .initSqlJs;
+        if (typeof initSqlJs !== 'function') {
+          reject(new Error('sql.js failed to load'));
           return;
         }
-        boot(initSqlJs).then(resolve).catch(reject);
+        start(initSqlJs).then(resolve, reject);
       };
       script.onerror = () =>
-        reject(new Error('Failed to load assets/sql-wasm.js'));
+        reject(new Error('Could not load assets/sql-wasm.js'));
       document.head.appendChild(script);
     });
   }
 
   private openIdb(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(IDB_NAME, 1);
+      const req = indexedDB.open('listacompra-db', 1);
       req.onupgradeneeded = () => {
-        if (!req.result.objectStoreNames.contains(IDB_STORE)) {
-          req.result.createObjectStore(IDB_STORE);
+        if (!req.result.objectStoreNames.contains('files')) {
+          req.result.createObjectStore('files');
         }
       };
       req.onsuccess = () => resolve(req.result);
-      req.onerror = () =>
-        reject(req.error ?? new Error('IndexedDB open failed'));
+      req.onerror = () => reject(req.error);
     });
   }
 
-  private async loadPersistedDb(): Promise<Uint8Array | null> {
-    if (typeof indexedDB === 'undefined') return null;
+  private async readFile(): Promise<Uint8Array | null> {
     try {
       const idb = await this.openIdb();
       return await new Promise((resolve, reject) => {
-        const tx = idb.transaction(IDB_STORE, 'readonly');
-        const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+        const req = idb.transaction('files', 'readonly').objectStore('files').get(DB_FILE_KEY);
         req.onsuccess = () => {
-          const value = req.result;
           idb.close();
+          const value = req.result;
           if (value instanceof Uint8Array) resolve(value);
-          else if (value instanceof ArrayBuffer)
-            resolve(new Uint8Array(value));
+          else if (value instanceof ArrayBuffer) resolve(new Uint8Array(value));
           else resolve(null);
         };
         req.onerror = () => {
           idb.close();
-          reject(req.error ?? new Error('IndexedDB read failed'));
+          reject(req.error);
         };
       });
     } catch {
@@ -194,21 +216,20 @@ export class SqliteService {
     }
   }
 
-  private async savePersistedDb(data: Uint8Array): Promise<void> {
-    if (typeof indexedDB === 'undefined') return;
+  private async writeFile(bytes: Uint8Array): Promise<void> {
     const idb = await this.openIdb();
     await new Promise<void>((resolve, reject) => {
-      const tx = idb.transaction(IDB_STORE, 'readwrite');
-      const copy = new Uint8Array(data.byteLength);
-      copy.set(data);
-      tx.objectStore(IDB_STORE).put(copy, IDB_KEY);
+      const tx = idb.transaction('files', 'readwrite');
+      // Copy so IndexedDB can clone the data safely
+      const copy = new Uint8Array(bytes);
+      tx.objectStore('files').put(copy, DB_FILE_KEY);
       tx.oncomplete = () => {
         idb.close();
         resolve();
       };
       tx.onerror = () => {
         idb.close();
-        reject(tx.error ?? new Error('IndexedDB write failed'));
+        reject(tx.error);
       };
     });
   }
