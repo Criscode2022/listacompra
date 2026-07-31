@@ -1,15 +1,18 @@
 import { effect, Injectable, signal } from '@angular/core';
-import { Storage } from '@ionic/storage-angular';
 import { BehaviorSubject } from 'rxjs';
-import { Product } from '../../types/product';
+import { MeasureUnit, Product, ProductCategory } from '../../types/product';
+import { SqliteService } from '../sqlite/sqlite.service';
+
+const SETTINGS_BASIC_MODE = 'basicMode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
-  private _storage: Storage | null = null;
   private syncCallback: (() => void) | null = null;
-  private suppressSync = false;
+  private suppressSync = true;
+  private ready = false;
+  private persistQueue: Promise<void> = Promise.resolve();
 
   public storageInitialized = new BehaviorSubject<void>(undefined);
   public products = signal<Product[]>([]);
@@ -20,19 +23,24 @@ export class DataService {
     this.readyResolve = resolve;
   });
 
-  constructor(private storage: Storage) {
+  constructor(private sqlite: SqliteService) {
     void this.initStorage();
+
     effect(() => {
-      this.storeData(this.products());
-      if (!this.suppressSync) this.syncCallback?.();
+      const products = this.products();
+      if (!this.ready || this.suppressSync) return;
+      this.enqueuePersist(() => this.storeData(products));
+      this.syncCallback?.();
     });
+
     effect(() => {
-      this._storage?.set('settings', { basicMode: this.basicMode() });
-      if (!this.suppressSync) this.syncCallback?.();
+      const basicMode = this.basicMode();
+      if (!this.ready || this.suppressSync) return;
+      this.enqueuePersist(() => this.storeSettings(basicMode));
+      this.syncCallback?.();
     });
   }
 
-  /** Resolves when Ionic Storage has finished loading products/settings. */
   whenReady(): Promise<void> {
     return this.readyPromise;
   }
@@ -54,65 +62,113 @@ export class DataService {
     this.products.set(products);
     this.basicMode.set(basicMode);
     this.suppressSync = false;
+    this.enqueuePersist(async () => {
+      await this.storeData(products);
+      await this.storeSettings(basicMode);
+    });
     if (!skipSync) this.syncCallback?.();
   }
 
-  async initStorage() {
+  async initStorage(): Promise<void> {
     try {
-      const storage = await this.storage.create();
-      this._storage = storage;
-
+      await this.sqlite.initialize();
       this.suppressSync = true;
 
-      const products = await this._storage.get('products');
+      const productRows = await this.sqlite.query(
+        'SELECT name, checked, quantity, urgent, unit, category FROM products ORDER BY name COLLATE NOCASE ASC',
+      );
+      this.products.set(
+        productRows.map((row) => ({
+          name: String(row['name'] ?? ''),
+          checked: Boolean(Number(row['checked'])),
+          quantity: Number(row['quantity'] ?? 1) || 1,
+          urgent: Boolean(Number(row['urgent'])),
+          unit: (row['unit'] as MeasureUnit) || 'ud',
+          category: (row['category'] as ProductCategory) || 'otros',
+        })),
+      );
 
-      if (products) {
-        const migrated = products.map((p: Product) => ({
-          ...p,
-          unit: p.unit || 'ud',
-          category: p.category || 'otros',
-        }));
-        this.products.set(migrated);
+      const settingsRows = await this.sqlite.query(
+        'SELECT value FROM app_settings WHERE key = ?',
+        [SETTINGS_BASIC_MODE],
+      );
+      if (settingsRows.length > 0) {
+        const raw = String(settingsRows[0]['value'] ?? 'false');
+        this.basicMode.set(raw === 'true' || raw === '1');
       }
-
-      const settings = await this._storage.get('settings');
-      if (settings?.basicMode !== undefined) {
-        this.basicMode.set(Boolean(settings.basicMode));
-      }
+    } catch (err) {
+      console.error('SQLite initStorage failed', err);
     } finally {
       this.suppressSync = false;
+      this.ready = true;
       this.storageInitialized.next();
       this.readyResolve();
     }
   }
 
-  public storeData(products: Product[]) {
-    this._storage?.set('products', products);
+  public async storeData(products: Product[]): Promise<void> {
+    await this.sqlite.executeSet([
+      { statement: 'DELETE FROM products', values: [] },
+      ...products.map((product) => ({
+        statement:
+          'INSERT INTO products (name, checked, quantity, urgent, unit, category) VALUES (?,?,?,?,?,?)',
+        values: [
+          product.name,
+          product.checked ? 1 : 0,
+          Number(product.quantity) || 1,
+          product.urgent ? 1 : 0,
+          product.unit || 'ud',
+          product.category || 'otros',
+        ],
+      })),
+    ]);
+    await this.sqlite.save();
   }
 
-  public async toggleStatus(productName: string) {
-    this.products.update((products) => {
-      return products.map((product) => {
-        if (product.name === productName) {
-          product.checked = !product.checked;
-
-          if (product.checked) {
-            product.quantity = 1;
-          }
-        }
-        return product;
-      });
-    });
+  public async storeSettings(basicMode: boolean): Promise<void> {
+    await this.sqlite.run(
+      'INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)',
+      [SETTINGS_BASIC_MODE, basicMode ? 'true' : 'false'],
+    );
+    await this.sqlite.save();
   }
 
-  public async delete(productName: string) {
-    this.products.update((products) => {
-      return products.filter((product) => product.name !== productName);
-    });
+  public async toggleStatus(productName: string): Promise<void> {
+    this.products.update((products) =>
+      products.map((product) => {
+        if (product.name !== productName) return product;
+        const checked = !product.checked;
+        return {
+          ...product,
+          checked,
+          quantity: checked ? 1 : product.quantity,
+        };
+      }),
+    );
   }
 
-  public async clearStorage() {
-    await this._storage?.clear();
-    this.products.set([]);
+  public async delete(productName: string): Promise<void> {
+    this.products.update((products) =>
+      products.filter((product) => product.name !== productName),
+    );
+  }
+
+  public async clearStorage(): Promise<void> {
+    this.suppressSync = true;
+    try {
+      await this.sqlite.execute('DELETE FROM products');
+      await this.sqlite.execute('DELETE FROM app_settings');
+      await this.sqlite.save();
+      this.products.set([]);
+      this.basicMode.set(false);
+    } finally {
+      this.suppressSync = false;
+    }
+  }
+
+  private enqueuePersist(task: () => Promise<void>): void {
+    this.persistQueue = this.persistQueue
+      .then(() => task())
+      .catch((err) => console.error('SQLite persist failed', err));
   }
 }

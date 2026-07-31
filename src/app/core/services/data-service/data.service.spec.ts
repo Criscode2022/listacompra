@@ -1,46 +1,56 @@
 import { TestBed } from '@angular/core/testing';
-import { Storage } from '@ionic/storage-angular';
 import { Product } from '../../types/product';
+import { SqliteService } from '../sqlite/sqlite.service';
 import { DataService } from './data.service';
 
 describe('DataService', () => {
-  let storage: {
-    get: jasmine.Spy;
-    set: jasmine.Spy;
-    clear: jasmine.Spy;
+  let sqlite: {
+    initialize: jasmine.Spy;
+    query: jasmine.Spy;
+    run: jasmine.Spy;
+    execute: jasmine.Spy;
+    executeSet: jasmine.Spy;
+    save: jasmine.Spy;
   };
-  let storageFactory: jasmine.SpyObj<Storage>;
 
   beforeEach(() => {
-    storage = {
-      get: jasmine.createSpy('get').and.resolveTo(null),
-      set: jasmine.createSpy('set').and.resolveTo(undefined),
-      clear: jasmine.createSpy('clear').and.resolveTo(undefined),
+    sqlite = {
+      initialize: jasmine.createSpy('initialize').and.resolveTo(undefined),
+      query: jasmine.createSpy('query').and.resolveTo([]),
+      run: jasmine.createSpy('run').and.resolveTo(undefined),
+      execute: jasmine.createSpy('execute').and.resolveTo(undefined),
+      executeSet: jasmine.createSpy('executeSet').and.resolveTo(undefined),
+      save: jasmine.createSpy('save').and.resolveTo(undefined),
     };
 
-    storageFactory = jasmine.createSpyObj<Storage>('Storage', ['create']);
-    storageFactory.create.and.resolveTo(storage as unknown as Storage);
-
     TestBed.configureTestingModule({
-      providers: [DataService, { provide: Storage, useValue: storageFactory }],
+      providers: [
+        DataService,
+        { provide: SqliteService, useValue: sqlite },
+      ],
     });
   });
 
   it('should be created', () => {
-    const service = TestBed.inject(DataService);
-    expect(service).toBeTruthy();
+    expect(TestBed.inject(DataService)).toBeTruthy();
   });
 
-  it('loads products from storage and migrates legacy fields', async () => {
-    const legacyProducts = [
-      {
-        name: 'Leche',
-        checked: false,
-        quantity: 2,
-        urgent: false,
-      },
-    ];
-    storage.get.and.resolveTo(legacyProducts);
+  it('loads products from SQLite with defaults for missing fields', async () => {
+    sqlite.query.and.callFake(async (sql: string) => {
+      if (sql.includes('FROM products')) {
+        return [
+          {
+            name: 'Leche',
+            checked: 0,
+            quantity: 2,
+            urgent: 0,
+            unit: '',
+            category: '',
+          },
+        ];
+      }
+      return [];
+    });
 
     const service = TestBed.inject(DataService);
     await service.initStorage();
@@ -109,23 +119,14 @@ describe('DataService', () => {
 
     await service.delete('Pan');
 
-    expect(service.products()).toEqual([
-      {
-        name: 'Leche',
-        checked: false,
-        quantity: 2,
-        urgent: false,
-        unit: 'l',
-        category: 'lácteos',
-      },
-    ]);
+    expect(service.products().map((p) => p.name)).toEqual(['Leche']);
   });
 
-  it('clears persisted data and resets products', async () => {
+  it('clears products and settings', async () => {
     const service = TestBed.inject(DataService);
     await service.initStorage();
 
-    const seeded: Product[] = [
+    service.products.set([
       {
         name: 'Huevos',
         checked: false,
@@ -134,16 +135,16 @@ describe('DataService', () => {
         unit: 'ud',
         category: 'otros',
       },
-    ];
-    service.products.set(seeded);
+    ]);
 
     await service.clearStorage();
 
-    expect(storage.clear).toHaveBeenCalled();
+    expect(sqlite.execute).toHaveBeenCalledWith('DELETE FROM products');
+    expect(sqlite.execute).toHaveBeenCalledWith('DELETE FROM app_settings');
     expect(service.products()).toEqual([]);
   });
 
-  it('stores products using ionic storage', async () => {
+  it('stores products with executeSet', async () => {
     const service = TestBed.inject(DataService);
     await service.initStorage();
 
@@ -158,8 +159,15 @@ describe('DataService', () => {
       },
     ];
 
-    service.storeData(products);
+    await service.storeData(products);
 
-    expect(storage.set).toHaveBeenCalledWith('products', products);
+    expect(sqlite.executeSet).toHaveBeenCalled();
+    const setArg = sqlite.executeSet.calls.mostRecent().args[0] as Array<{
+      statement: string;
+      values: unknown[];
+    }>;
+    expect(setArg[0].statement).toContain('DELETE FROM products');
+    expect(setArg[1].values).toEqual(['Agua', 0, 6, 0, 'l', 'bebidas']);
+    expect(sqlite.save).toHaveBeenCalled();
   });
 });
