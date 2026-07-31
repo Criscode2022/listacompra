@@ -14,6 +14,7 @@ import {
 } from '@ionic/angular';
 import { AppModeService } from '../core/services/app-mode/app-mode.service';
 import { DataService } from '../core/services/data-service/data.service';
+import { NotificationService } from '../core/services/notifications/notification.service';
 import { AuthUser, NeonService } from '../core/services/neon/neon.service';
 import { Product } from '../core/types/product';
 
@@ -32,10 +33,12 @@ export class SettingsComponent implements OnInit {
   private neon = inject(NeonService);
   private cdr = inject(ChangeDetectorRef);
   protected dataService = inject(DataService);
+  protected notifications = inject(NotificationService);
 
   protected onlineMode = false;
   protected onlineUser: AuthUser | null = null;
   protected switchingMode = false;
+  protected notificationBusy = false;
 
   private get isDesktop(): boolean {
     return (
@@ -46,6 +49,7 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.onlineMode = this.appMode.isOnline() || this.appMode.hasOnlineIntent();
+    this.notifications.permission.set(this.notifications.getPermission());
     void this.loadOnlineUser();
   }
 
@@ -163,6 +167,123 @@ export class SettingsComponent implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  protected get notificationsSupported(): boolean {
+    return this.notifications.isSupported();
+  }
+
+  protected get notificationsEnabled(): boolean {
+    return this.notifications.preferences().enabled;
+  }
+
+  protected get notificationPermissionLabel(): string {
+    switch (this.notifications.permission()) {
+      case 'granted':
+        return 'Permiso concedido';
+      case 'denied':
+        return 'Bloqueadas por el navegador';
+      case 'unsupported':
+        return 'No disponibles en este navegador';
+      default:
+        return 'Permiso no solicitado';
+    }
+  }
+
+  protected async onNotificationsToggle(event: CustomEvent): Promise<void> {
+    const enabled = event.detail.checked;
+    if (this.notificationBusy) return;
+    this.notificationBusy = true;
+
+    try {
+      if (!enabled) {
+        this.notifications.disable();
+        this.cdr.detectChanges();
+        await this.showStatusToast('Notificaciones desactivadas', false, 'medium');
+        return;
+      }
+
+      if (!this.notifications.isSupported()) {
+        this.cdr.detectChanges();
+        await this.showStatusToast(
+          'Este navegador no admite notificaciones',
+          true,
+        );
+        return;
+      }
+
+      const ok = await this.notifications.enable();
+      this.notifications.permission.set(this.notifications.getPermission());
+      this.cdr.detectChanges();
+
+      if (!ok) {
+        const perm = this.notifications.getPermission();
+        if (perm === 'denied') {
+          await this.showStatusToast(
+            'Activa las notificaciones en la configuración del navegador',
+            true,
+          );
+        } else {
+          await this.showStatusToast(
+            'No se pudo activar las notificaciones',
+            true,
+          );
+        }
+        return;
+      }
+
+      await this.notifications.sendTestNotification();
+      await this.showStatusToast('Notificaciones activadas', false);
+    } finally {
+      this.notificationBusy = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  protected onRemindPendingChange(event: CustomEvent): void {
+    this.notifications.updatePreferences({
+      remindPending: event.detail.checked,
+    });
+  }
+
+  protected onRemindUrgentChange(event: CustomEvent): void {
+    this.notifications.updatePreferences({
+      remindUrgent: event.detail.checked,
+    });
+  }
+
+  protected async sendTestNotification(): Promise<void> {
+    if (this.notificationBusy) return;
+    this.notificationBusy = true;
+    try {
+      if (this.notifications.getPermission() !== 'granted') {
+        const ok = await this.notifications.enable();
+        if (!ok) {
+          await this.showStatusToast(
+            'Necesitas permitir las notificaciones del navegador',
+            true,
+          );
+          return;
+        }
+      }
+
+      if (!this.notifications.preferences().enabled) {
+        this.notifications.updatePreferences({ enabled: true });
+      }
+
+      const sent = await this.notifications.sendTestNotification();
+      if (sent) {
+        await this.showStatusToast('Notificación de prueba enviada', false);
+      } else {
+        await this.showStatusToast(
+          'No se pudo mostrar la notificación de prueba',
+          true,
+        );
+      }
+    } finally {
+      this.notificationBusy = false;
+      this.cdr.detectChanges();
+    }
   }
 
   protected exportProducts() {

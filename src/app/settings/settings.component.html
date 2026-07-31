@@ -125,6 +125,92 @@
     </div>
   </div>
 
+  <!-- Notifications section -->
+  <div class="settings-section">
+    <p class="section-title">Notificaciones</p>
+    <div class="settings-card">
+
+      <div class="settings-row non-interactive" *ngIf="!notificationsSupported">
+        <div class="row-icon" style="--row-icon-color: #8e8e93">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+        </div>
+        <div class="row-text">
+          <span class="row-label">No disponibles</span>
+          <span class="row-sublabel">Este navegador no admite notificaciones</span>
+        </div>
+      </div>
+
+      <ng-container *ngIf="notificationsSupported">
+        <div class="settings-row non-interactive">
+          <div class="row-icon" style="--row-icon-color: #5856d6">
+            <ion-icon name="notifications-outline"></ion-icon>
+          </div>
+          <div class="row-text">
+            <span class="row-label">Notificaciones del navegador</span>
+            <span class="row-sublabel">{{ notificationPermissionLabel }}</span>
+          </div>
+          <ion-toggle
+            [checked]="notificationsEnabled"
+            (ionChange)="onNotificationsToggle($event)"
+            [disabled]="notificationBusy || notifications.permission() === 'denied'"
+          ></ion-toggle>
+        </div>
+
+        <ng-container *ngIf="notificationsEnabled">
+          <div class="divider"></div>
+
+          <div class="settings-row non-interactive">
+            <div class="row-icon" style="--row-icon-color: #ff3b30">
+              <ion-icon name="flash-outline"></ion-icon>
+            </div>
+            <div class="row-text">
+              <span class="row-label">Recordar urgentes</span>
+              <span class="row-sublabel">Aviso diario si hay productos urgentes</span>
+            </div>
+            <ion-toggle
+              [checked]="notifications.preferences().remindUrgent"
+              (ionChange)="onRemindUrgentChange($event)"
+            ></ion-toggle>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="settings-row non-interactive">
+            <div class="row-icon" style="--row-icon-color: #007aff">
+              <ion-icon name="cart-outline"></ion-icon>
+            </div>
+            <div class="row-text">
+              <span class="row-label">Recordar lista pendiente</span>
+              <span class="row-sublabel">Aviso diario con productos sin marcar</span>
+            </div>
+            <ion-toggle
+              [checked]="notifications.preferences().remindPending"
+              (ionChange)="onRemindPendingChange($event)"
+            ></ion-toggle>
+          </div>
+
+          <div class="divider"></div>
+
+          <button
+            class="settings-row"
+            (click)="sendTestNotification()"
+            [disabled]="notificationBusy"
+          >
+            <div class="row-icon" style="--row-icon-color: #34c759">
+              <ion-icon name="paper-plane-outline"></ion-icon>
+            </div>
+            <div class="row-text">
+              <span class="row-label">Enviar prueba</span>
+              <span class="row-sublabel">Comprueba que las notificaciones funcionan</span>
+            </div>
+            <ion-icon name="chevron-forward-outline" class="row-chevron"></ion-icon>
+          </button>
+        </ng-container>
+      </ng-container>
+
+    </div>
+  </div>
+
   <!-- Display section -->
   <div class="settings-section">
     <p class="section-title">Apariencia</p>

@@ -15,8 +15,13 @@ export class DataService {
   public products = signal<Product[]>([]);
   public basicMode = signal<boolean>(false);
 
+  private readyResolve!: () => void;
+  private readonly readyPromise = new Promise<void>((resolve) => {
+    this.readyResolve = resolve;
+  });
+
   constructor(private storage: Storage) {
-    this.initStorage();
+    void this.initStorage();
     effect(() => {
       this.storeData(this.products());
       if (!this.suppressSync) this.syncCallback?.();
@@ -25,6 +30,11 @@ export class DataService {
       this._storage?.set('settings', { basicMode: this.basicMode() });
       if (!this.suppressSync) this.syncCallback?.();
     });
+  }
+
+  /** Resolves when Ionic Storage has finished loading products/settings. */
+  whenReady(): Promise<void> {
+    return this.readyPromise;
   }
 
   setSyncCallback(cb: () => void): void {
@@ -48,28 +58,32 @@ export class DataService {
   }
 
   async initStorage() {
-    const storage = await this.storage.create();
-    this._storage = storage;
+    try {
+      const storage = await this.storage.create();
+      this._storage = storage;
 
-    this.suppressSync = true;
+      this.suppressSync = true;
 
-    const products = await this._storage.get('products');
+      const products = await this._storage.get('products');
 
-    if (products) {
-      const migrated = products.map((p: Product) => ({
-        ...p,
-        unit: p.unit || 'ud',
-        category: p.category || 'otros',
-      }));
-      this.products.set(migrated);
+      if (products) {
+        const migrated = products.map((p: Product) => ({
+          ...p,
+          unit: p.unit || 'ud',
+          category: p.category || 'otros',
+        }));
+        this.products.set(migrated);
+      }
+
+      const settings = await this._storage.get('settings');
+      if (settings?.basicMode !== undefined) {
+        this.basicMode.set(Boolean(settings.basicMode));
+      }
+    } finally {
+      this.suppressSync = false;
+      this.storageInitialized.next();
+      this.readyResolve();
     }
-
-    const settings = await this._storage.get('settings');
-    if (settings?.basicMode !== undefined) {
-      this.basicMode.set(Boolean(settings.basicMode));
-    }
-
-    this.suppressSync = false;
   }
 
   public storeData(products: Product[]) {
