@@ -24,6 +24,7 @@ El proyecto está orientado a una experiencia sencilla y rápida para gestionar 
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Calidad y pruebas](#calidad-y-pruebas)
 - [Testing](#testing)
+- [Documentación del caso](#documentación-del-caso)
 - [Posibles mejoras futuras](#posibles-mejoras-futuras)
 
 ## Visión general
@@ -263,3 +264,7 @@ npm run lint
 npm run test:ci
 npm run build
 ```
+
+## Documentación del caso
+
+Markdown de producto, arquitectura y testing: [`docs/README.md`](./docs/README.md). También en el portfolio: [cristiancode.dev/featured/listacompra](https://cristiancode.dev/featured/listacompra).
