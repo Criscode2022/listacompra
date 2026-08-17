@@ -59,6 +59,16 @@ describe('TabsPage', () => {
   });
 
   beforeEach(() => {
+    spyOn(window, 'matchMedia').and.callFake((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => false,
+    }));
     fixture = TestBed.createComponent(TabsPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -100,6 +110,7 @@ describe('TabsPage', () => {
   });
 
   it('openSettings should present a glass settings sheet modal', async () => {
+    component.isDesktopLayout.set(false);
     await component.openSettings();
 
     expect(modalCreateSpy).toHaveBeenCalled();

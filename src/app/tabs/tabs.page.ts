@@ -28,18 +28,18 @@ export class TabsPage {
   isDesktopLayout = signal(matchesDesktopLayout());
   protected currentUrl = signal(this.router.url);
 
-  protected pantryCount = computed(
+  pantryCount = computed(
     () => this.dataService.products().filter((product) => !product.urgent).length,
   );
 
-  protected listCount = computed(
+  listCount = computed(
     () =>
       this.dataService
         .products()
         .filter((product) => !product.checked && !product.urgent).length,
   );
 
-  protected urgentCount = computed(
+  urgentCount = computed(
     () => this.dataService.products().filter((product) => product.urgent).length,
   );
 
