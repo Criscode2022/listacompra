@@ -36,35 +36,36 @@
       <h1 class="desktop-title">{{ title }}</h1>
       <p class="desktop-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
     </div>
-    <div class="desktop-actions" slot="end">
-      <button
+    <ion-buttons slot="end" class="desktop-actions">
+      <ion-button
         *ngIf="!deleteButtonInvisible"
-        type="button"
-        class="desktop-ghost-btn danger"
+        fill="outline"
+        color="danger"
+        class="desktop-ghost-btn"
         (click)="clearStorage()"
       >
-        <ion-icon name="trash-outline"></ion-icon>
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
         Borrar todos
-      </button>
-      <button
+      </ion-button>
+      <ion-button
         *ngIf="actionButtonIcon"
-        type="button"
+        fill="outline"
         class="desktop-ghost-btn"
         (click)="actionButtonCallback?.()"
       >
-        <ion-icon [name]="actionButtonIcon"></ion-icon>
+        <ion-icon slot="start" [name]="actionButtonIcon"></ion-icon>
         {{ actionButtonLabel || 'Acción' }}
-      </button>
-      <button
+      </ion-button>
+      <ion-button
         *ngIf="primaryLabel"
-        type="button"
+        fill="solid"
+        [color]="color === 'danger' ? 'danger' : 'primary'"
         class="desktop-cta-btn"
-        [class.danger]="color === 'danger'"
         (click)="primaryCallback?.()"
       >
-        <ion-icon name="add"></ion-icon>
+        <ion-icon slot="start" name="add"></ion-icon>
         {{ primaryLabel }}
-      </button>
-    </div>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>

@@ -46,6 +46,14 @@
       debounce="150"
       show-clear-button="focus"
     ></ion-searchbar>
+    <ion-button
+      class="desktop-inline-cta"
+      fill="outline"
+      (click)="exportToPdf()"
+    >
+      <ion-icon slot="start" name="download-outline"></ion-icon>
+      Exportar PDF
+    </ion-button>
   </div>
 
   <ng-container *ngIf="pendingProducts().length; else emptyOrNoMatch">

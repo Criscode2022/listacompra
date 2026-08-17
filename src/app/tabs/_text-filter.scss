@@ -3,12 +3,45 @@
     padding: 0 12px 10px;
 
     @media (min-width: 1200px) {
-      max-width: 420px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: none;
       padding: 8px 28px 18px;
     }
   }
 
+  .desktop-inline-cta {
+    display: none;
+
+    @media (min-width: 1200px) {
+      display: inline-flex;
+      --border-radius: 12px;
+      --padding-start: 16px;
+      --padding-end: 18px;
+      height: 40px;
+      margin: 0;
+      flex-shrink: 0;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+  }
+
+  .desktop-command-bar {
+    display: none;
+
+    @media (min-width: 1200px) {
+      display: flex;
+      justify-content: flex-end;
+      padding: 8px 28px 12px;
+    }
+  }
+
   .text-filter-bar ion-searchbar {
+    @media (min-width: 1200px) {
+      max-width: 420px;
+      flex: 1 1 auto;
+    }
     --background: rgba(255, 255, 255, 0.78);
     --border-radius: 12px;
     --box-shadow:

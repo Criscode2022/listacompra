@@ -60,8 +60,8 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     const cta = fixture.nativeElement.querySelector(
-      '.desktop-cta-btn',
-    ) as HTMLButtonElement | null;
+      'ion-button.desktop-cta-btn',
+    ) as HTMLElement | null;
     expect(cta?.textContent).toContain('Añadir producto');
     cta?.click();
     expect(component.primaryCallback).toHaveBeenCalled();
