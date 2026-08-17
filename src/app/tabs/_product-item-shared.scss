@@ -2,6 +2,10 @@
   .#{$list-class} {
     background: transparent;
     padding: 0 12px 100px;
+
+    @media (min-width: 1200px) {
+      padding: 4px 28px 36px;
+    }
   }
 
   .#{$item-class} {

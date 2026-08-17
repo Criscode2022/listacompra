@@ -75,6 +75,38 @@ ion-content {
   }
 }
 
+@media (min-width: 1200px) {
+  ion-content {
+    --background: #f7f7fa;
+  }
+
+  ion-content::part(scroll) {
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  ion-fab {
+    display: none !important;
+  }
+
+  .empty {
+    max-width: 28rem;
+    margin: 4.5rem auto;
+    padding: 0 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  app-header ion-toolbar.desktop-toolbar {
+    --background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: none;
+    box-shadow: none;
+  }
+}
+
 ion-app,
 ion-router-outlet {
   background: var(--apple-grouped-bg, #f2f2f7);
@@ -134,6 +166,11 @@ app-header ion-toolbar {
   @media (min-width: 1024px) {
     --padding-start: max(24px, calc((100vw - 1120px) / 2));
     --padding-end: max(24px, calc((100vw - 1120px) / 2));
+  }
+
+  @media (min-width: 1200px) {
+    --padding-start: 12px;
+    --padding-end: 12px;
   }
 }
 
@@ -273,6 +310,29 @@ ion-modal.settings-sheet::part(handle) {
   width: 36px;
   height: 5px;
   border-radius: 9999px;
+}
+
+ion-modal.settings-dialog {
+  --width: min(480px, calc(100vw - 48px));
+  --height: min(760px, 86vh);
+  --border-radius: 20px;
+  --box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 0 0 0.5px rgba(255, 255, 255, 0.4);
+  --background: transparent;
+
+  &::part(content) {
+    margin: auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(242, 242, 247, 0.94);
+    backdrop-filter: blur(36px) saturate(180%);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
 }
 
 /* ─── Modern Scrollbar ─── */

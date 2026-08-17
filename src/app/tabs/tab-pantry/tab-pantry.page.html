@@ -1,4 +1,10 @@
-<app-header title="Despensa" icon="home"></app-header>
+<app-header
+  title="Despensa"
+  icon="home"
+  [subtitle]="heroSubtitle()"
+  primaryLabel="Añadir producto"
+  [primaryCallback]="addProduct.bind(this)"
+></app-header>
 
 <ion-content>
   <!-- Category Filter Bar -->

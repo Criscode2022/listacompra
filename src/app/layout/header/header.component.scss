@@ -71,3 +71,137 @@
   visibility: hidden;
   pointer-events: none;
 }
+
+.desktop-toolbar {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .mobile-toolbar {
+    display: none;
+  }
+
+  .desktop-toolbar {
+    display: flex;
+    --min-height: 108px;
+    --background: transparent;
+    --border-width: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: none;
+    box-shadow: none;
+    padding-inline: 8px 12px;
+  }
+
+  .glass-header {
+    box-shadow: none;
+  }
+}
+
+.desktop-title-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 8px 16px 20px;
+  min-width: 0;
+}
+
+.desktop-kicker {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.48);
+  margin-bottom: 4px;
+}
+
+.desktop-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: #1c1c1e;
+}
+
+.desktop-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.desktop-toolbar.tint-danger .desktop-title {
+  color: #ff3b30;
+}
+
+.desktop-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+}
+
+.desktop-ghost-btn,
+.desktop-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  cursor: pointer;
+  transition:
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.desktop-ghost-btn {
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  background: rgba(255, 255, 255, 0.82);
+  color: #1c1c1e;
+
+  &:hover {
+    background: #fff;
+    border-color: rgba(60, 60, 67, 0.2);
+  }
+
+  &.danger {
+    color: #ff3b30;
+    border-color: rgba(255, 59, 48, 0.22);
+    background: rgba(255, 59, 48, 0.08);
+  }
+}
+
+.desktop-cta-btn {
+  border: none;
+  color: #fff;
+  background: #007aff;
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.28);
+
+  &:hover {
+    background: #0066d6;
+  }
+
+  &.danger {
+    background: #ff3b30;
+    box-shadow: 0 8px 20px rgba(255, 59, 48, 0.28);
+
+    &:hover {
+      background: #e0342a;
+    }
+  }
+}

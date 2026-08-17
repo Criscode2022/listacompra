@@ -1,6 +1,11 @@
 @mixin text-filter-bar {
   .text-filter-bar {
     padding: 0 12px 10px;
+
+    @media (min-width: 1200px) {
+      max-width: 420px;
+      padding: 8px 28px 18px;
+    }
   }
 
   .text-filter-bar ion-searchbar {

@@ -1,7 +1,9 @@
 <app-header
   title="Lista"
   icon="reader"
+  [subtitle]="heroSubtitle()"
   [actionButtonIcon]="'download'"
+  actionButtonLabel="Exportar PDF"
   [actionButtonCallback]="exportToPdf.bind(this)"
 ></app-header>
 

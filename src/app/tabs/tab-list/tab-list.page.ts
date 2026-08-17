@@ -47,6 +47,16 @@ export class TabListPage {
     );
   });
 
+  protected heroSubtitle = computed(() => {
+    const pending = this.dataService
+      .products()
+      .filter((product) => !product.checked && !product.urgent);
+    if (!pending.length) {
+      return 'Nada pendiente de comprar';
+    }
+    return `${pending.length} producto${pending.length === 1 ? '' : 's'} en la lista`;
+  });
+
   protected categoryCounts = computed(() => {
     const pending = this.dataService
       .products()

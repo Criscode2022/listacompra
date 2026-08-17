@@ -1,4 +1,11 @@
-<app-header title="Urgente" icon="alert" color="danger"></app-header>
+<app-header
+  title="Urgente"
+  icon="alert"
+  color="danger"
+  [subtitle]="heroSubtitle()"
+  primaryLabel="Añadir urgente"
+  [primaryCallback]="addProduct.bind(this)"
+></app-header>
 
 <ion-content>
   <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0 && !dataService.basicMode()">

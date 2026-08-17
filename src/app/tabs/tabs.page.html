@@ -1,3 +1,54 @@
+<aside class="desktop-sidebar" aria-label="Navegación principal">
+  <div class="sidebar-brand">
+    <div class="brand-mark" aria-hidden="true">
+      <ion-icon name="bag-handle"></ion-icon>
+    </div>
+    <div class="brand-copy">
+      <strong>Lista</strong>
+      <span>de la compra</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a
+      routerLink="/despensa"
+      routerLinkActive="is-active"
+      class="sidebar-link"
+    >
+      <ion-icon name="home-outline"></ion-icon>
+      <span>Despensa</span>
+      <em>{{ pantryCount() }}</em>
+    </a>
+    <a
+      routerLink="/lista"
+      routerLinkActive="is-active"
+      class="sidebar-link"
+    >
+      <ion-icon name="reader-outline"></ion-icon>
+      <span>Lista</span>
+      <em>{{ listCount() }}</em>
+    </a>
+    <a
+      routerLink="/urgente"
+      routerLinkActive="is-active"
+      class="sidebar-link urgent"
+    >
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>Urgente</span>
+      <em>{{ urgentCount() }}</em>
+    </a>
+  </nav>
+
+  <button
+    type="button"
+    class="sidebar-settings"
+    (click)="openSettings()"
+  >
+    <ion-icon name="settings-outline"></ion-icon>
+    <span>Configuración</span>
+  </button>
+</aside>
+
 <ion-tabs>
   <ion-tab-bar
     class="liquid-glass-bar w-80 md:w-[28rem] md:py-1 rounded-full m-auto mb-4"
@@ -18,6 +69,53 @@
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>
+
+<aside
+  class="desktop-rail"
+  *ngIf="showListRail()"
+  aria-label="Lista de la compra"
+>
+  <header class="rail-header">
+    <div>
+      <p class="rail-kicker">Ahora</p>
+      <h2>Por comprar</h2>
+    </div>
+    <span class="rail-count">{{ listCount() }}</span>
+  </header>
+
+  <a
+    *ngIf="urgentCount() > 0"
+    routerLink="/urgente"
+    class="rail-urgent"
+  >
+    <ion-icon name="alert-circle"></ion-icon>
+    {{ urgentCount() }} urgente{{ urgentCount() === 1 ? '' : 's' }}
+  </a>
+
+  <div class="rail-list" *ngIf="railProducts().length; else railEmpty">
+    <button
+      type="button"
+      class="rail-item"
+      *ngFor="let product of railProducts()"
+      (click)="dataService.toggleStatus(product.name)"
+    >
+      <span
+        class="rail-dot"
+        [style.background]="getCategoryColor(product.category)"
+      ></span>
+      <span class="rail-name">{{ product.name }}</span>
+      <span class="rail-qty"
+        >{{ product.quantity }}{{ product.unit }}</span
+      >
+    </button>
+  </div>
+
+  <a routerLink="/lista" class="rail-footer">Ver lista completa</a>
+</aside>
+
+<ng-template #railEmpty>
+  <p class="rail-empty">Nada pendiente. Marca productos en la despensa cuando se terminen.</p>
+</ng-template>
 
 <button class="settings-fab" (click)="openSettings()" aria-label="Configuración">
   <ion-icon name="settings-outline"></ion-icon>
