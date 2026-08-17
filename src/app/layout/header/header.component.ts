@@ -15,9 +15,13 @@ export class HeaderComponent {
   @Input() title = '';
   @Input() icon = '';
   @Input() color = 'primary';
+  @Input() subtitle = '';
   @Input() deleteButtonInvisible = true;
   @Input() actionButtonIcon: string | undefined;
+  @Input() actionButtonLabel: string | undefined;
   @Input() actionButtonCallback: (() => void) | undefined;
+  @Input() primaryLabel: string | undefined;
+  @Input() primaryCallback: (() => void) | undefined;
 
   private alertController = inject(AlertController);
   protected dataService = inject(DataService);

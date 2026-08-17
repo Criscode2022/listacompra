@@ -47,6 +47,14 @@ export class TabUrgentPage {
     );
   });
 
+  protected heroSubtitle = computed(() => {
+    const urgent = this.products().filter((product) => product.urgent);
+    if (!urgent.length) {
+      return 'Sin compras de una sola vez';
+    }
+    return `${urgent.length} urgente${urgent.length === 1 ? '' : 's'}`;
+  });
+
   protected categoryCounts = computed(() => {
     const urgent = this.products().filter((product) => product.urgent);
     const counts: Record<string, number> = { all: urgent.length };

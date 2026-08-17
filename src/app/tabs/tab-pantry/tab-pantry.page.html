@@ -1,6 +1,18 @@
-<app-header title="Despensa" icon="home"></app-header>
+<app-header
+  title="Despensa"
+  icon="home"
+  [subtitle]="heroSubtitle()"
+  primaryLabel="Añadir producto"
+  [primaryCallback]="addProduct.bind(this)"
+></app-header>
 
 <ion-content>
+  <div class="desktop-command-bar" *ngIf="!tabProducts().length">
+    <ion-button class="desktop-inline-cta" fill="solid" (click)="addProduct()">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir producto
+    </ion-button>
+  </div>
   <!-- Category Filter Bar -->
   <div class="filter-bar" *ngIf="products().length && !dataService.basicMode()">
     <div class="filter-scroll">
@@ -40,6 +52,14 @@
       debounce="150"
       show-clear-button="focus"
     ></ion-searchbar>
+    <ion-button
+      class="desktop-inline-cta"
+      fill="solid"
+      (click)="addProduct()"
+    >
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir producto
+    </ion-button>
   </div>
 
   <!-- Product List -->

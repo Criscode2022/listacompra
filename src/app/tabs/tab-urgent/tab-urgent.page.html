@@ -1,6 +1,19 @@
-<app-header title="Urgente" icon="alert" color="danger"></app-header>
+<app-header
+  title="Urgente"
+  icon="alert"
+  color="danger"
+  [subtitle]="heroSubtitle()"
+  primaryLabel="Añadir urgente"
+  [primaryCallback]="addProduct.bind(this)"
+></app-header>
 
 <ion-content>
+  <div class="desktop-command-bar" *ngIf="!tabProducts().length">
+    <ion-button class="desktop-inline-cta" fill="solid" color="danger" (click)="addProduct()">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir urgente
+    </ion-button>
+  </div>
   <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0 && !dataService.basicMode()">
     <div class="filter-scroll">
       <button
@@ -39,6 +52,15 @@
       debounce="150"
       show-clear-button="focus"
     ></ion-searchbar>
+    <ion-button
+      class="desktop-inline-cta"
+      fill="solid"
+      color="danger"
+      (click)="addProduct()"
+    >
+      <ion-icon slot="start" name="add"></ion-icon>
+      Añadir urgente
+    </ion-button>
   </div>
 
   <ng-container *ngIf="urgentProducts().length; else emptyOrNoMatch">

@@ -41,8 +41,10 @@ describe('HeaderComponent', () => {
   it('should render glass header chrome classes', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('ion-header.glass-header')).toBeTruthy();
-    expect(el.querySelector('ion-toolbar.glass-toolbar')).toBeTruthy();
+    expect(el.querySelector('ion-toolbar.glass-toolbar.mobile-toolbar')).toBeTruthy();
+    expect(el.querySelector('ion-toolbar.desktop-toolbar')).toBeTruthy();
     expect(el.querySelector('ion-title')?.textContent?.trim()).toBe('Lista');
+    expect(el.querySelector('.desktop-title')?.textContent?.trim()).toBe('Lista');
   });
 
   it('should apply danger tint class for urgent chrome', () => {
@@ -50,6 +52,19 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
     const toolbar = fixture.nativeElement.querySelector('ion-toolbar');
     expect(toolbar?.classList.contains('tint-danger')).toBeTrue();
+  });
+
+  it('should render a labeled desktop primary action', () => {
+    component.primaryLabel = 'Añadir producto';
+    component.primaryCallback = jasmine.createSpy('primaryCallback');
+    fixture.detectChanges();
+
+    const cta = fixture.nativeElement.querySelector(
+      'ion-button.desktop-cta-btn',
+    ) as HTMLElement | null;
+    expect(cta?.textContent).toContain('Añadir producto');
+    cta?.click();
+    expect(component.primaryCallback).toHaveBeenCalled();
   });
 
   it('should wire clear storage action button when visible', () => {

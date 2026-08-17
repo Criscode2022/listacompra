@@ -18,6 +18,13 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   column-gap: 12px;
   row-gap: 10px;
+
+  @media (min-width: 1200px) {
+    padding: 4px 28px 36px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    column-gap: 14px;
+    row-gap: 12px;
+  }
 }
 
 .shopping-list ion-item.shopping-item {

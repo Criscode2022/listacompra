@@ -66,6 +66,15 @@ export class TabPantryPage {
     );
   });
 
+  protected heroSubtitle = computed(() => {
+    const pantry = this.products().filter((product) => !product.urgent);
+    if (!pantry.length) {
+      return 'Añade tus productos habituales';
+    }
+    const pending = pantry.filter((product) => !product.checked).length;
+    return `${pantry.length} producto${pantry.length === 1 ? '' : 's'} · ${pending} por comprar`;
+  });
+
   protected categoryCounts = computed(() => {
     const pantry = this.products().filter((p) => !p.urgent);
     const counts: Record<string, number> = { all: pantry.length };

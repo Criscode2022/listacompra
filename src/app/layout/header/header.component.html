@@ -1,5 +1,5 @@
 <ion-header [translucent]="true" class="glass-header">
-  <ion-toolbar class="glass-toolbar" [class.tint-danger]="color === 'danger'">
+  <ion-toolbar class="glass-toolbar mobile-toolbar" [class.tint-danger]="color === 'danger'">
     <ion-icon
       slot="start"
       class="header-leading-icon ion-margin"
@@ -24,9 +24,48 @@
       fill="clear"
       color="primary"
       (click)="actionButtonCallback?.()"
-      aria-label="Acción"
+      [attr.aria-label]="actionButtonLabel || 'Acción'"
     >
       <ion-icon slot="icon-only" [name]="actionButtonIcon"></ion-icon>
     </ion-button>
+  </ion-toolbar>
+
+  <ion-toolbar class="glass-toolbar desktop-toolbar" [class.tint-danger]="color === 'danger'">
+    <div class="desktop-title-block" slot="start">
+      <span class="desktop-kicker">Lista de la compra</span>
+      <h1 class="desktop-title">{{ title }}</h1>
+      <p class="desktop-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+    <ion-buttons slot="end" class="desktop-actions">
+      <ion-button
+        *ngIf="!deleteButtonInvisible"
+        fill="outline"
+        color="danger"
+        class="desktop-ghost-btn"
+        (click)="clearStorage()"
+      >
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+        Borrar todos
+      </ion-button>
+      <ion-button
+        *ngIf="actionButtonIcon"
+        fill="outline"
+        class="desktop-ghost-btn"
+        (click)="actionButtonCallback?.()"
+      >
+        <ion-icon slot="start" [name]="actionButtonIcon"></ion-icon>
+        {{ actionButtonLabel || 'Acción' }}
+      </ion-button>
+      <ion-button
+        *ngIf="primaryLabel"
+        fill="solid"
+        [color]="color === 'danger' ? 'danger' : 'primary'"
+        class="desktop-cta-btn"
+        (click)="primaryCallback?.()"
+      >
+        <ion-icon slot="start" name="add"></ion-icon>
+        {{ primaryLabel }}
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
