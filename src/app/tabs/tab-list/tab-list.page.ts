@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { IonicModule, ModalController } from '@ionic/angular';
 import jsPDF from 'jspdf';
 import { DataService } from 'src/app/core/services/data-service/data.service';
 import { matchesTextFilter } from 'src/app/core/utils/product-filter';
@@ -10,6 +11,8 @@ import {
   PRODUCT_CATEGORIES,
   ProductCategory,
 } from 'src/app/core/types/product';
+import { AddProductModalComponent } from 'src/app/layout/add-product-modal/add-product-modal.component';
+import { EmptyStateComponent } from 'src/app/layout/empty-state/empty-state.component';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
 
 @Component({
@@ -23,9 +26,12 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
     FormsModule,
     IonicModule,
     HeaderComponent,
+    EmptyStateComponent,
   ],
 })
 export class TabListPage {
+  private modalController = inject(ModalController);
+  private snackbar = inject(MatSnackBar);
   protected dataService = inject(DataService);
   protected categories = PRODUCT_CATEGORIES;
   protected selectedFilter = signal<ProductCategory | 'all'>('all');
@@ -76,6 +82,58 @@ export class TabListPage {
 
   protected updateTextFilter(event: CustomEvent<{ value?: string | null }>) {
     this.textFilter.set(event.detail?.value ?? '');
+  }
+
+  protected async addProduct() {
+    const isDesktop =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px)').matches;
+
+    const modal = await this.modalController.create({
+      component: AddProductModalComponent,
+      componentProps: { isUrgent: false },
+      cssClass: 'add-product-modal',
+      ...(isDesktop
+        ? {}
+        : {
+            breakpoints: [0, 1],
+            initialBreakpoint: 1,
+            handle: false,
+          }),
+    });
+
+    await modal.present();
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role !== 'confirm' || !data) return;
+
+    const existingProducts = this.dataService.products();
+    if (
+      existingProducts.some(
+        (product) => product.name.toLowerCase() === data.name.toLowerCase(),
+      )
+    ) {
+      this.snackbar.open(`Producto ya existente`, 'Cerrar', {
+        duration: 3000,
+      });
+      return;
+    }
+
+    this.dataService.products.update((products) => [
+      ...products,
+      {
+        name: data.name,
+        checked: false,
+        quantity: data.quantity,
+        urgent: false,
+        unit: data.unit,
+        category: data.category,
+      },
+    ]);
+
+    this.snackbar.open(`Producto añadido a la lista`, 'Cerrar', {
+      duration: 1500,
+    });
   }
 
   protected getCategoryColor(category: string): string {

@@ -17,6 +17,7 @@ import {
   ProductCategory,
 } from 'src/app/core/types/product';
 import { AddProductModalComponent } from 'src/app/layout/add-product-modal/add-product-modal.component';
+import { EmptyStateComponent } from 'src/app/layout/empty-state/empty-state.component';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
 import { StopPropagationDirective } from '../../core/directives/stop-propagation/stop-propagation.directive';
 
@@ -30,6 +31,7 @@ import { StopPropagationDirective } from '../../core/directives/stop-propagation
     FormsModule,
     IonicModule,
     HeaderComponent,
+    EmptyStateComponent,
     StopPropagationDirective,
   ],
 })

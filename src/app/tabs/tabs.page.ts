@@ -7,9 +7,16 @@ import {
   signal,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import {
+  AlertController,
+  ModalController,
+  NavController,
+  ToastController,
+} from '@ionic/angular';
 import { filter } from 'rxjs/operators';
+import { AppModeService } from '../core/services/app-mode/app-mode.service';
 import { DataService } from '../core/services/data-service/data.service';
+import { NeonService } from '../core/services/neon/neon.service';
 import { PRODUCT_CATEGORIES } from '../core/types/product';
 import { matchesDesktopLayout } from '../core/utils/breakpoints';
 import { SettingsComponent } from '../settings/settings.component';
@@ -23,10 +30,16 @@ export class TabsPage {
   private modalCtrl = inject(ModalController);
   private navCtrl = inject(NavController);
   private router = inject(Router);
+  private appMode = inject(AppModeService);
+  private neon = inject(NeonService);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
   protected dataService = inject(DataService);
 
   isDesktopLayout = signal(matchesDesktopLayout());
   protected currentUrl = signal(this.router.url);
+  protected cloudOn = signal(this.appMode.isOnline());
+  protected cloudBusy = signal(false);
 
   pantryCount = computed(
     () => this.dataService.products().filter((product) => !product.urgent).length,
@@ -67,6 +80,10 @@ export class TabsPage {
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => this.currentUrl.set(event.urlAfterRedirects));
+
+    this.appMode.watchMode().subscribe((mode) => {
+      this.cloudOn.set(mode === 'online');
+    });
   }
 
   @HostListener('window:resize')
@@ -79,6 +96,73 @@ export class TabsPage {
       PRODUCT_CATEGORIES.find((item) => item.value === category)?.color ??
       '#868e96'
     );
+  }
+
+  protected async toggleCloud(): Promise<void> {
+    if (this.cloudBusy()) return;
+    if (this.cloudOn()) {
+      await this.confirmDisableCloud();
+      return;
+    }
+    await this.enableCloud();
+  }
+
+  private async enableCloud(): Promise<void> {
+    this.cloudBusy.set(true);
+    try {
+      this.appMode.setOnlineIntent();
+      const session = await this.neon.getSession();
+      if (session) {
+        this.appMode.enableOnlineMode();
+        await this.showCloudToast('Modo nube activado');
+        return;
+      }
+      await this.navCtrl.navigateRoot('/auth');
+    } finally {
+      this.cloudBusy.set(false);
+    }
+  }
+
+  private async confirmDisableCloud(): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Desactivar modo nube',
+      message:
+        'Se cerrará tu sesión en la nube. Tus productos seguirán guardados en este dispositivo.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Desactivar',
+          handler: () => {
+            void this.disableCloud();
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async disableCloud(): Promise<void> {
+    this.cloudBusy.set(true);
+    try {
+      await this.neon.signOut();
+      this.appMode.disableOnlineMode();
+      await this.showCloudToast('Modo nube desactivado', 'medium');
+    } finally {
+      this.cloudBusy.set(false);
+    }
+  }
+
+  private async showCloudToast(
+    message: string,
+    color: 'success' | 'medium' = 'success',
+  ): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2200,
+      position: 'bottom',
+      color,
+    });
+    await toast.present();
   }
 
   async openSettings() {

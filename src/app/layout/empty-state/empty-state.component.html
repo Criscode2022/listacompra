@@ -1,0 +1,18 @@
+<div class="empty-state" [class.tone-danger]="tone === 'danger'">
+  <button
+    type="button"
+    class="empty-card"
+    [class.has-cta]="!!ctaLabel"
+    (click)="ctaLabel && onCta()"
+  >
+    <span class="empty-icon" aria-hidden="true">
+      <ion-icon [name]="icon"></ion-icon>
+    </span>
+    <h2>{{ title }}</h2>
+    <p *ngIf="message">{{ message }}</p>
+    <span class="empty-cta" *ngIf="ctaLabel">
+      <ion-icon [name]="ctaIcon"></ion-icon>
+      {{ ctaLabel }}
+    </span>
+  </button>
+</div>

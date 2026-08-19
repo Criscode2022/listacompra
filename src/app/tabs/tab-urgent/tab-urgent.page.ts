@@ -11,6 +11,7 @@ import {
   ProductCategory,
 } from 'src/app/core/types/product';
 import { AddProductModalComponent } from 'src/app/layout/add-product-modal/add-product-modal.component';
+import { EmptyStateComponent } from 'src/app/layout/empty-state/empty-state.component';
 import { HeaderComponent } from 'src/app/layout/header/header.component';
 
 @Component({
@@ -18,7 +19,13 @@ import { HeaderComponent } from 'src/app/layout/header/header.component';
   templateUrl: 'tab-urgent.page.html',
   styleUrls: ['tab-urgent.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, HeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    HeaderComponent,
+    EmptyStateComponent,
+  ],
 })
 export class TabUrgentPage {
   private modalController = inject(ModalController);

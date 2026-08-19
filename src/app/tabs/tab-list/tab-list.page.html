@@ -5,9 +5,11 @@
   [actionButtonIcon]="'download'"
   actionButtonLabel="Exportar PDF"
   [actionButtonCallback]="exportToPdf.bind(this)"
+  primaryLabel="Añadir producto"
+  [primaryCallback]="addProduct.bind(this)"
 ></app-header>
 
-<ion-content>
+<ion-content [class.is-empty]="!pendingProducts().length">
   <div class="filter-bar" *ngIf="categoryCounts()['all'] > 0 && !dataService.basicMode()">
     <div class="filter-scroll">
       <button
@@ -95,17 +97,21 @@
 </ion-content>
 
 <ng-template #emptyOrNoMatch>
-  <div class="empty" *ngIf="textFilter().trim(); else empty">
-    No hay coincidencias para "{{ textFilter() }}".
-  </div>
+  <app-empty-state
+    *ngIf="textFilter().trim(); else empty"
+    icon="search-outline"
+    title="Sin coincidencias"
+    [message]="'No hay coincidencias para “' + textFilter() + '”.'"
+  ></app-empty-state>
 </ng-template>
 
 <ng-template #empty>
-  <div class="empty">
-    No hay productos en tu lista de la compra. Añade desde la
-    <a routerLink="/despensa" class="text-blue-500 hover:text-blue-800"
-      >despensa</a
-    >
-    lo que necesites comprar.
-  </div>
+  <app-empty-state
+    icon="bag-handle-outline"
+    title="La lista está vacía"
+    message="Añade lo que necesites comprar. También puedes marcar productos desde la despensa."
+    ctaLabel="Añadir producto"
+    ctaIcon="add"
+    (cta)="addProduct()"
+  ></app-empty-state>
 </ng-template>

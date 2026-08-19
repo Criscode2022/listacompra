@@ -6,7 +6,7 @@
   [primaryCallback]="addProduct.bind(this)"
 ></app-header>
 
-<ion-content>
+<ion-content [class.is-empty]="!pantryProducts().length">
   <div class="desktop-command-bar" *ngIf="!tabProducts().length">
     <ion-button class="desktop-inline-cta" fill="solid" (click)="addProduct()">
       <ion-icon slot="start" name="add"></ion-icon>
@@ -140,20 +140,21 @@
 </ion-content>
 
 <ng-template #emptyOrNoMatch>
-  <div class="empty" *ngIf="textFilter().trim(); else empty">
-    No hay coincidencias para "{{ textFilter() }}".
-  </div>
+  <app-empty-state
+    *ngIf="textFilter().trim(); else empty"
+    icon="search-outline"
+    title="Sin coincidencias"
+    [message]="'No hay coincidencias para “' + textFilter() + '”.'"
+  ></app-empty-state>
 </ng-template>
 
 <ng-template #empty>
-  <div class="empty">
-    No hay productos en tu despensa. Añade
-    <span
-      class="text-blue-500 hover:text-blue-800 cursor-pointer"
-      (click)="addProduct()"
-      >aquí</span
-    >
-    tus productos habituales para añadirlos a la lista cuando necesites
-    comprarlos.
-  </div>
+  <app-empty-state
+    icon="home-outline"
+    title="Despensa vacía"
+    message="Añade tus productos habituales. Cuando se terminen, márcalos para pasarlos a la lista."
+    ctaLabel="Añadir producto"
+    ctaIcon="add"
+    (cta)="addProduct()"
+  ></app-empty-state>
 </ng-template>

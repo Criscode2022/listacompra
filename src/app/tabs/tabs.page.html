@@ -39,14 +39,31 @@
     </a>
   </nav>
 
-  <button
-    type="button"
-    class="sidebar-settings"
-    (click)="openSettings()"
-  >
-    <ion-icon name="settings-outline"></ion-icon>
-    <span>Configuración</span>
-  </button>
+  <div class="sidebar-footer">
+    <button
+      type="button"
+      class="sidebar-cloud"
+      [class.is-on]="cloudOn()"
+      [disabled]="cloudBusy()"
+      (click)="toggleCloud()"
+      [attr.aria-pressed]="cloudOn()"
+      [attr.aria-label]="cloudOn() ? 'Desactivar modo nube' : 'Activar modo nube'"
+    >
+      <ion-icon
+        [name]="cloudOn() ? 'cloud-done-outline' : 'cloud-offline-outline'"
+      ></ion-icon>
+      <span>Modo nube</span>
+      <em>{{ cloudOn() ? 'On' : 'Off' }}</em>
+    </button>
+    <button
+      type="button"
+      class="sidebar-settings"
+      (click)="openSettings()"
+    >
+      <ion-icon name="settings-outline"></ion-icon>
+      <span>Configuración</span>
+    </button>
+  </div>
 </aside>
 
 <ion-tabs>

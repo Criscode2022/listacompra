@@ -7,7 +7,7 @@
   [primaryCallback]="addProduct.bind(this)"
 ></app-header>
 
-<ion-content>
+<ion-content [class.is-empty]="!urgentProducts().length">
   <div class="desktop-command-bar" *ngIf="!tabProducts().length">
     <ion-button class="desktop-inline-cta" fill="solid" color="danger" (click)="addProduct()">
       <ion-icon slot="start" name="add"></ion-icon>
@@ -107,19 +107,22 @@
 </ion-fab>
 
 <ng-template #emptyOrNoMatch>
-  <div class="empty" *ngIf="textFilter().trim(); else empty">
-    No hay coincidencias para "{{ textFilter() }}".
-  </div>
+  <app-empty-state
+    *ngIf="textFilter().trim(); else empty"
+    icon="search-outline"
+    title="Sin coincidencias"
+    [message]="'No hay coincidencias para “' + textFilter() + '”.'"
+  ></app-empty-state>
 </ng-template>
 
 <ng-template #empty>
-  <div class="empty">
-    No hay productos urgentes. Añade
-    <span
-      class="text-red-500 hover:text-red-800 cursor-pointer"
-      (click)="addProduct()"
-      >aquí</span
-    >
-    lo que necesites comprar solo una vez.
-  </div>
+  <app-empty-state
+    icon="flash-outline"
+    title="Nada urgente"
+    message="Añade lo que necesites comprar solo una vez."
+    ctaLabel="Añadir urgente"
+    ctaIcon="add"
+    tone="danger"
+    (cta)="addProduct()"
+  ></app-empty-state>
 </ng-template>

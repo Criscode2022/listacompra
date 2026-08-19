@@ -2,8 +2,11 @@ import { signal } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ModalController, NavController } from '@ionic/angular';
+import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular';
+import { of } from 'rxjs';
+import { AppModeService } from '../core/services/app-mode/app-mode.service';
 import { DataService } from '../core/services/data-service/data.service';
+import { NeonService } from '../core/services/neon/neon.service';
 import { SettingsComponent } from '../settings/settings.component';
 import { TabsPage } from './tabs.page';
 
@@ -31,6 +34,25 @@ describe('TabsPage', () => {
       providers: [
         { provide: ModalController, useValue: { create: modalCreateSpy } },
         { provide: NavController, useValue: { navigateRoot: jasmine.createSpy('navigateRoot') } },
+        { provide: AlertController, useValue: { create: jasmine.createSpy('create') } },
+        { provide: ToastController, useValue: { create: jasmine.createSpy('create') } },
+        {
+          provide: AppModeService,
+          useValue: {
+            isOnline: () => false,
+            watchMode: () => of('offline'),
+            setOnlineIntent: () => undefined,
+            enableOnlineMode: () => undefined,
+            disableOnlineMode: () => undefined,
+          },
+        },
+        {
+          provide: NeonService,
+          useValue: {
+            getSession: () => Promise.resolve(null),
+            signOut: () => Promise.resolve(),
+          },
+        },
         {
           provide: DataService,
           useValue: {
