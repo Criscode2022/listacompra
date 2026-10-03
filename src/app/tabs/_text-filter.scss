@@ -27,16 +27,6 @@
     }
   }
 
-  .desktop-command-bar {
-    display: none;
-
-    @media (min-width: 1200px) {
-      display: flex;
-      justify-content: flex-end;
-      padding: 8px 28px 12px;
-    }
-  }
-
   .text-filter-bar ion-searchbar {
     @media (min-width: 1200px) {
       max-width: 420px;

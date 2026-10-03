@@ -118,6 +118,27 @@ describe('TabsPage', () => {
     expect(component.openSettings).toHaveBeenCalled();
   });
 
+  it('hides the shopping rail on the urgent page at desktop width', () => {
+    component.isDesktopLayout.set(true);
+    const url = (
+      component as unknown as { currentUrl: { set: (value: string) => void } }
+    ).currentUrl;
+
+    url.set('/despensa');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.desktop-rail')).toBeTruthy();
+    expect(fixture.nativeElement.classList.contains('has-rail')).toBeTrue();
+
+    url.set('/urgente');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.desktop-rail')).toBeNull();
+    expect(fixture.nativeElement.classList.contains('has-rail')).toBeFalse();
+
+    url.set('/lista');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.desktop-rail')).toBeNull();
+  });
+
   it('should render a desktop sidebar with the three destinations', () => {
     const el: HTMLElement = fixture.nativeElement;
     const sidebar = el.querySelector('.desktop-sidebar');

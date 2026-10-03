@@ -10,8 +10,11 @@
 
 @media (min-width: 1200px) {
   :host {
-    min-height: calc(100dvh - 168px);
-    padding: 1rem 1.5rem 2.5rem;
+    /* Fill the desktop pane. A viewport min-height is taller than the
+       pane under the header and forces a scrollbar. */
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1.5rem;
   }
 }
 

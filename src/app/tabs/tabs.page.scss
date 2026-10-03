@@ -319,9 +319,16 @@
     display: none !important;
   }
 
+  /* ion-tabs is position:absolute with width/height 100% (and contain:size),
+     so side margins do not shrink it. Pin the box with left + width instead. */
   :host ion-tabs {
-    margin: 16px 16px 16px 276px;
+    top: 16px;
+    left: 276px;
+    right: auto;
+    bottom: auto;
+    width: calc(100% - 276px - 16px);
     height: calc(100% - 32px);
+    margin: 0;
     border-radius: 22px;
     overflow: hidden;
     background: #f7f7fa;
@@ -331,7 +338,7 @@
   }
 
   :host.has-rail ion-tabs {
-    margin-right: 372px;
+    width: calc(100% - 276px - 372px);
   }
 
   .desktop-sidebar {
@@ -533,7 +540,10 @@
     z-index: 20;
     padding: 22px 18px 16px;
     border-radius: 22px;
+    overflow: hidden;
+    isolation: isolate;
     background: rgba(255, 255, 255, 0.78);
+    background-clip: padding-box;
     backdrop-filter: blur(28px) saturate(160%);
     -webkit-backdrop-filter: blur(28px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.7);

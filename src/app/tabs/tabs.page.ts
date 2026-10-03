@@ -62,9 +62,12 @@ export class TabsPage {
       .filter((product) => !product.checked && !product.urgent),
   );
 
-  protected showListRail = computed(
-    () => this.isDesktopLayout() && !this.currentUrl().includes('/lista'),
-  );
+  protected showListRail = computed(() => {
+    if (!this.isDesktopLayout()) return false;
+    const url = this.currentUrl();
+    // The list is the rail itself, and urgent is its own full-width board.
+    return !url.includes('/lista') && !url.includes('/urgente');
+  });
 
   @HostBinding('class.desktop-shell')
   get desktopShellClass(): boolean {

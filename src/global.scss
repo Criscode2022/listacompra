@@ -80,6 +80,10 @@ ion-content {
     --background: #f7f7fa;
   }
 
+  ion-content.is-empty {
+    --overflow: hidden;
+  }
+
   ion-content::part(scroll) {
     max-width: none;
     margin-inline: 0;
