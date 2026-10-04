@@ -30,6 +30,7 @@
 
 .settings-content {
   --background: #f2f2f7;
+  --padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
 }
 
 .settings-section {

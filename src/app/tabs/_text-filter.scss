@@ -24,6 +24,12 @@
       flex-shrink: 0;
       font-weight: 600;
       letter-spacing: -0.015em;
+
+      &[fill='outline'] {
+        --border-width: 0;
+        --border-style: none;
+        --box-shadow: none;
+      }
     }
   }
 

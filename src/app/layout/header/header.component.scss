@@ -150,11 +150,35 @@
   letter-spacing: -0.015em;
 }
 
-.desktop-cta-btn {
-  --border-radius: 12px;
+.desktop-export-btn {
+  --border-width: 0;
+  --border-style: none;
+  --box-shadow: none;
+}
+
+.desktop-actions .desktop-cta-btn {
+  /* ion-buttons forces a 2px radius on toolbar buttons. */
+  --border-radius: 9999px !important;
+  --border-width: 0;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
   --padding-start: 16px;
-  --padding-end: 18px;
-  --box-shadow: 0 8px 20px rgba(0, 122, 255, 0.28);
-  font-weight: 600;
+  --padding-end: 16px;
+  --box-shadow: 0 4px 10px rgba(0, 122, 255, 0.22);
+  margin: 0;
+  min-height: 42px;
+  font-size: 0.92rem;
+  font-weight: 650;
   letter-spacing: -0.015em;
+  text-transform: none;
+
+  ion-icon {
+    font-size: 18px;
+    color: #fff;
+    opacity: 1;
+  }
+}
+
+.desktop-toolbar.tint-danger .desktop-cta-btn {
+  --box-shadow: 0 4px 10px rgba(255, 59, 48, 0.22);
 }

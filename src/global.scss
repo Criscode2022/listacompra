@@ -316,9 +316,19 @@ ion-modal.settings-sheet::part(handle) {
   border-radius: 9999px;
 }
 
+/* Max snap is 0.85 in tabs.page openSettings, so the bottom 15% of the
+   scrollport hangs below the screen. Pad by that amount, plus a little
+   clearance, so the last section can scroll fully into view. */
+ion-modal.settings-sheet ion-content.settings-content {
+  --padding-bottom: calc(
+    0.15 * (100dvh - var(--ion-safe-area-top, 0px) - 10px) +
+      max(28px, env(safe-area-inset-bottom, 0px))
+  );
+}
+
 ion-modal.settings-dialog {
   --width: min(480px, calc(100vw - 48px));
-  --height: min(760px, 86vh);
+  --height: min(720px, calc(100dvh - 88px));
   --border-radius: 20px;
   --box-shadow:
     0 24px 64px rgba(0, 0, 0, 0.18),
@@ -326,7 +336,7 @@ ion-modal.settings-dialog {
   --background: transparent;
 
   &::part(content) {
-    margin: auto;
+    margin: 24px auto 36px;
     border-radius: 20px;
     overflow: hidden;
     background: rgba(242, 242, 247, 0.94);
