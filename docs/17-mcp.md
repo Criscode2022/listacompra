@@ -4,9 +4,9 @@ title: MCP para agentes
 
 # MCP para agentes
 
-El servidor MCP deja que un agente gestione las mismas cuentas y la misma lista que la app. Una **tarea** es un producto de `public.products` (Despensa, Lista o Urgente). Un **usuario** es una cuenta de Neon Auth.
+El servidor MCP deja que un agente gestione la lista de la compra de la persona que ha iniciado sesión. Un **ítem** es un producto de `public.products` (Despensa, Lista o Urgente).
 
-Endpoint de producción: `https://lalistadelacompra.netlify.app/mcp`.
+Endpoint de producción: `https://listacompra-mcp.cristiancode.dev/mcp`.
 
 ## Autenticación
 
@@ -33,17 +33,19 @@ Rutas públicas, además de `POST /mcp`:
 
 Un 401 de `/mcp` incluye `WWW-Authenticate` con `resource_metadata`. La página de consentimiento está en español. La contraseña se comprueba contra el hash de Neon Auth, con el mismo scrypt que usa la app.
 
-Scopes: `tasks:read`, `tasks:write`, `users:read`, `users:write`. Un usuario normal no recibe `users:write`. Una clave no puede tener scopes que ni el llamador ni el rol del usuario destino puedan tener.
+Scopes: `tasks:read`, `tasks:write`, `users:read`, `users:write`. Un usuario normal no recibe `users:write`. Una clave no puede tener scopes que ni el llamador ni el rol del usuario destino puedan tener. Los identificadores de scope no cambian: las claves y las concesiones OAuth ya emitidas siguen valiendo. En la página de consentimiento se leen como la lista de la compra, no como tareas.
 
 ## Herramientas
 
-Lectura: `get_current_user`, `list_users`, `get_user`, `list_tasks`, `get_task`, `list_api_keys`.
+El agente ve la lista, no la administración de cuentas. La app añade, edita, marca y borra productos, y filtra por Despensa, Lista y Urgente. `get_current_user` dice de quién es el token. No hay herramientas para crear cuentas, cambiar contraseñas, bloquear usuarios ni emitir claves: eso no está en la app.
 
-Escritura: `create_user`, `update_user`, `set_user_password`, `create_task`, `update_task`, `set_task_checked`, `create_api_key`.
+Lectura: `get_current_user`, `list_items`, `get_item`.
 
-Destructivas (el agente debe confirmarlas con la persona): `ban_user`, `unban_user`, `delete_user`, `delete_task`, `revoke_api_key`.
+Escritura: `create_item`, `update_item`, `set_item_checked`.
 
-`view` de las tareas sigue las pestañas de la app: `lista` (sin marcar y no urgente), `despensa` (no urgente), `urgente`, `all`. El nombre es la identidad del producto. Cantidad de 1 a 999. Unidades `ud`, `kg`, `g`, `l`, `ml`, `oz`, `lb`.
+Destructiva (el agente debe confirmar el nombre con la persona): `delete_item`.
+
+`view` de los ítems sigue las pestañas de la app: `lista` (sin marcar y no urgente), `despensa` (no urgente), `urgente`, `all`. El nombre es la identidad del producto. Cantidad de 1 a 999. Unidades `ud`, `kg`, `g`, `l`, `ml`, `oz`, `lb`.
 
 ## Variables
 
@@ -51,7 +53,7 @@ Destructivas (el agente debe confirmarlas con la persona): `ban_user`, `unban_us
 |---|---|
 | `DATABASE_URL` | Postgres de Neon. Solo en el servidor. El rol owner no fuerza RLS, así que el código filtra siempre por `user_id`. |
 | `MCP_BEARER_TOKEN` | Secreto compartido del operador. |
-| `MCP_PUBLIC_URL` | Origen público, por ejemplo `https://lalistadelacompra.netlify.app`. |
+| `MCP_PUBLIC_URL` | Origen público, por ejemplo `https://listacompra-mcp.cristiancode.dev`. |
 | `MCP_ALLOWED_ORIGIN` | Origen CORS del inspector. Si no está, la respuesta usa `*`. |
 | `MCP_PORT` | Puerto local. Por defecto `8787`. |
 

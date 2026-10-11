@@ -270,7 +270,7 @@ export async function getTask(
 ): Promise<ShoppingTask> {
   requireScope(principal, "tasks:read");
   const task = await store.getTask(targetUserId(principal, input.userId), assertProductName(input.name));
-  if (!task) throw new ServiceError("Task not found.", "not_found");
+  if (!task) throw new ServiceError("Item not found.", "not_found");
   return task;
 }
 
@@ -331,7 +331,7 @@ export async function updateTask(
       assertProductName(input.name),
       patch,
     );
-    if (!task) throw new ServiceError("Task not found.", "not_found");
+    if (!task) throw new ServiceError("Item not found.", "not_found");
     return task;
   } catch (error) {
     if (error instanceof ServiceError) throw error;
@@ -347,7 +347,7 @@ export async function deleteTask(
   requireScope(principal, "tasks:write");
   const name = assertProductName(input.name);
   const deleted = await store.deleteTask(targetUserId(principal, input.userId), name);
-  if (!deleted) throw new ServiceError("Task not found.", "not_found");
+  if (!deleted) throw new ServiceError("Item not found.", "not_found");
   return { deleted: true, name };
 }
 

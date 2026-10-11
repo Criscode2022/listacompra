@@ -8,9 +8,10 @@ import {
   resourceMatches,
   verifyPkce,
 } from "./domain.mts";
+import { stdioPrincipal } from "./auth.mts";
 import { handleHttp } from "./http.mts";
 import { MemoryStore, newId } from "./memory-store.mts";
-import { verifyCredentials } from "./services.mts";
+import { createApiKey, revokeApiKey, verifyCredentials } from "./services.mts";
 
 const ORIGIN = "http://127.0.0.1:8787";
 const SECRET = "operator-token-0123456789abcdef";
@@ -93,7 +94,7 @@ test("MCP_ALLOWED_ORIGIN replaces the wildcard", async () => {
   }
 });
 
-test("initialize and task tools honor shopping-list rules", async () => {
+test("initialize and item tools honor shopping-list rules", async () => {
   const store = new MemoryStore();
   const userId = await seedUser(store, "ana@example.com", "user");
   const options = { store, sharedSecret: SECRET, publicUrl: ORIGIN };
@@ -110,7 +111,14 @@ test("initialize and task tools honor shopping-list rules", async () => {
   const handshake = (await initialized.json()) as { result: { serverInfo: { name: string } } };
   assert.equal(handshake.result.serverInfo.name, "listacompra");
 
-  const created = await tool(store, SECRET, "create_task", {
+  const listedTools = await handleHttp(rpc({ jsonrpc: "2.0", id: 2, method: "tools/list" }, SECRET), options);
+  const catalog = (await listedTools.json()) as { result: { tools: { name: string }[] } };
+  assert.deepEqual(
+    catalog.result.tools.map((entry) => entry.name).sort(),
+    ["create_item", "delete_item", "get_current_user", "get_item", "list_items", "set_item_checked", "update_item"],
+  );
+
+  const created = await tool(store, SECRET, "create_item", {
     user_id: userId,
     name: " Leche ",
     quantity: 2,
@@ -121,56 +129,60 @@ test("initialize and task tools honor shopping-list rules", async () => {
   assert.equal(created.name, "Leche");
   assert.equal(created.urgent, true);
 
-  const duplicate = await toolRaw(store, SECRET, "create_task", { user_id: userId, name: "Leche" });
+  const duplicate = await toolRaw(store, SECRET, "create_item", { user_id: userId, name: "Leche" });
   assert.equal(duplicate.result.isError, true);
 
-  const badCategory = await toolRaw(store, SECRET, "create_task", {
+  const badCategory = await toolRaw(store, SECRET, "create_item", {
     user_id: userId,
     name: "Pan",
     category: "no-existe",
   });
   assert.ok(badCategory.error || badCategory.result?.isError);
 
-  await tool(store, SECRET, "set_task_checked", { user_id: userId, name: "Leche", checked: true });
-  const urgent = await tool(store, SECRET, "list_tasks", { user_id: userId, view: "urgente" });
+  const one = await tool(store, SECRET, "get_item", { user_id: userId, name: "Leche" });
+  assert.equal(one.name, "Leche");
+
+  await tool(store, SECRET, "set_item_checked", { user_id: userId, name: "Leche", checked: true });
+  const urgent = await tool(store, SECRET, "list_items", { user_id: userId, view: "urgente" });
   assert.equal(urgent.total, 1);
-  const lista = await tool(store, SECRET, "list_tasks", { user_id: userId, view: "lista" });
+  assert.equal(urgent.items.length, 1);
+  const lista = await tool(store, SECRET, "list_items", { user_id: userId, view: "lista" });
   assert.equal(lista.total, 0);
-  const despensa = await tool(store, SECRET, "list_tasks", { user_id: userId, view: "despensa" });
+  const despensa = await tool(store, SECRET, "list_items", { user_id: userId, view: "despensa" });
   assert.equal(despensa.total, 0);
 
-  await tool(store, SECRET, "update_task", { user_id: userId, name: "Leche", urgent: false, checked: false, quantity: 1 });
-  const shopping = await tool(store, SECRET, "list_tasks", { user_id: userId, view: "lista" });
+  await tool(store, SECRET, "update_item", { user_id: userId, name: "Leche", urgent: false, checked: false, quantity: 1 });
+  const shopping = await tool(store, SECRET, "list_items", { user_id: userId, view: "lista" });
   assert.equal(shopping.total, 1);
-  await tool(store, SECRET, "delete_task", { user_id: userId, name: "Leche" });
-  const empty = await tool(store, SECRET, "list_tasks", { user_id: userId, view: "all" });
+  await tool(store, SECRET, "delete_item", { user_id: userId, name: "Leche" });
+  const empty = await tool(store, SECRET, "list_items", { user_id: userId, view: "all" });
   assert.equal(empty.total, 0);
+
+  const removed = await toolRaw(store, SECRET, "ban_user", { user_id: userId });
+  assert.equal(removed.result.isError, true);
 });
 
-test("a normal user cannot list other accounts", async () => {
+test("a read-only API key can list items and a revoked key stops working", async () => {
   const store = new MemoryStore();
   const selfId = await seedUser(store, "self@example.com", "user");
-  await seedUser(store, "other@example.com", "user");
-  const minted = await tool(store, SECRET, "create_api_key", {
-    user_id: selfId,
+  const operator = stdioPrincipal();
+  const minted = await createApiKey(store, operator, {
+    userId: selfId,
     label: "phone",
-    scopes: ["tasks:read", "users:read"],
+    scopes: ["tasks:read"],
   });
-  const listed = await tool(store, minted.apiKey, "list_users", {});
-  assert.equal(listed.total, 1);
-  assert.equal(listed.users[0].email, "self@example.com");
+  const listed = await tool(store, minted.apiKey, "list_items", {});
+  assert.equal(listed.total, 0);
 
-  const crossUser = await toolRaw(store, minted.apiKey, "get_user", { email: "other@example.com" });
-  assert.equal(crossUser.result.isError, true);
+  const write = await toolRaw(store, minted.apiKey, "create_item", { name: "Pan" });
+  assert.equal(write.result.isError, true);
 
-  const tooWide = await toolRaw(store, SECRET, "create_api_key", {
-    user_id: selfId,
-    label: "admin-key",
-    scopes: ["users:write"],
-  });
-  assert.equal(tooWide.result.isError, true);
+  await assert.rejects(
+    () => createApiKey(store, operator, { userId: selfId, label: "admin-key", scopes: ["users:write"] }),
+    /Cannot grant scope users:write/,
+  );
 
-  await tool(store, SECRET, "revoke_api_key", { user_id: selfId, id: minted.key.id });
+  await revokeApiKey(store, operator, { userId: selfId, id: minted.key.id });
   const revoked = await handleHttp(rpc({ jsonrpc: "2.0", id: 1, method: "tools/list" }, minted.apiKey), {
     store,
     sharedSecret: SECRET,
@@ -298,7 +310,7 @@ test("OAuth authorization code, PKCE, refresh reuse, and tool calls", async () =
   assert.equal(issued.status, 200);
   const tokens = (await issued.json()) as { access_token: string; refresh_token: string; scope: string };
   assert.equal(tokens.scope.includes("users:write"), false);
-  const created = await tool(store, tokens.access_token, "create_task", { name: "Huevos", quantity: 6 });
+  const created = await tool(store, tokens.access_token, "create_item", { name: "Huevos", quantity: 6 });
   assert.equal(created.userId, userId);
 
   const refreshed = await token(store, {
