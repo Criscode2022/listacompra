@@ -20,6 +20,7 @@ Documentación de producto y testing usada también en el portfolio ([cristianco
 | 14 | [Testing · integración](./14-testing-integration.md) |
 | 15 | [Testing · e2e](./15-testing-e2e.md) |
 | 16 | [Testing · GitHub Actions](./16-testing-ci.md) |
+| 17 | [MCP para agentes](./17-mcp.md) |
 
 SQLite en el navegador: [`SQLITE.md`](./SQLITE.md).
 

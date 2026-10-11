@@ -12,7 +12,10 @@
     "test:watch": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "mcp": "node --experimental-strip-types netlify/mcp/cli.mts",
+    "mcp:stdio": "node --experimental-strip-types netlify/mcp/cli.mts stdio",
+    "test:mcp": "node --experimental-strip-types --test netlify/mcp/mcp.test.mts"
   },
   "private": true,
   "dependencies": {
@@ -27,6 +30,7 @@
     "@angular/platform-browser-dynamic": "^17.3.12",
     "@angular/router": "^17.3.12",
     "@angular/service-worker": "^17.3.12",
+    "@better-auth/utils": "^0.5.0",
     "@capacitor/android": "5.2.2",
     "@capacitor/app": "5.0.6",
     "@capacitor/core": "5.2.2",
@@ -34,13 +38,17 @@
     "@capacitor/keyboard": "5.0.6",
     "@capacitor/status-bar": "5.0.6",
     "@ionic/angular": "^7.2.2",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@neondatabase/neon-js": "^0.6.1-beta",
+    "@neondatabase/serverless": "^1.2.0",
+    "@netlify/functions": "^6.0.2",
     "ionic-app-base": "file:",
     "ionicons": "^7.1.2",
     "jspdf": "^2.5.1",
     "rxjs": "~7.8.0",
     "sql.js": "^1.12.0",
     "tslib": "^2.6.1",
+    "zod": "^4.6.6",
     "zone.js": "^0.14.10"
   },
   "devDependencies": {
