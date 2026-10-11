@@ -17,7 +17,7 @@ El cliente envía `Authorization: Bearer`. El token no va en la query. El orden 
 | Secreto compartido | `MCP_BEARER_TOKEN` | Operador. Admin, sin `user_id`. Las herramientas de lista piden `user_id`. |
 | Clave de API | prefijo `lc_` | El usuario dueño de la clave. Los scopes son los de la clave. |
 | Access token OAuth | prefijo `ola_` | El usuario que inició sesión en `/authorize`. |
-| Sesión de Neon Auth | token de sesión de la app, en claro o SHA-256 | Ese usuario, con los scopes de su rol. |
+| Sesión de Neon Auth | token opaco de `neon_auth.session` (en claro o SHA-256), o el JWT de Neon Auth (`eyJ…`) firmado con `NEON_AUTH_JWKS_URL` | Ese usuario, con los scopes de su rol. El JWT caduca a los pocos minutos. |
 | stdio local | sin token | El operador de la máquina. |
 
 OAuth 2.1 usa código de autorización y PKCE S256. Hay registro dinámico de clientes, metadatos de recurso protegido y de servidor de autorización, rotación de refresh tokens y revocación. Un refresh token reutilizado revoca la familia. No hay grant `client_credentials`.

@@ -13,6 +13,9 @@ export interface HttpOptions {
   sharedSecret?: string;
   publicUrl?: string;
   stdio?: boolean;
+  now?: number;
+  jwksUrl?: string;
+  jwksKeys?: import("./neon-jwt.mts").NeonJwk[];
 }
 
 const ready = new WeakMap<Store, Promise<void>>();
@@ -49,15 +52,19 @@ export async function handleHttp(request: Request, options: HttpOptions = {}): P
   }
 
   const sharedSecret = options.sharedSecret ?? readEnv("MCP_BEARER_TOKEN");
-  const principal = options.stdio
-    ? stdioPrincipal()
-    : await resolvePrincipal(store, request, sharedSecret);
-  if (!principal) {
+  const auth = options.stdio
+    ? { principal: stdioPrincipal() }
+    : await resolvePrincipal(store, request, sharedSecret, {
+        now: options.now,
+        jwksUrl: options.jwksUrl,
+        keys: options.jwksKeys,
+      });
+  if (!auth.principal) {
     const origin = publicOriginFromRequest(request, options.publicUrl ?? readEnv("MCP_PUBLIC_URL"));
-    return withCors(unauthorized(origin));
+    return withCors(unauthorized(origin, auth.errorDescription));
   }
 
-  const server = buildServer(store, principal);
+  const server = buildServer(store, auth.principal);
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
@@ -110,12 +117,12 @@ function prepare(store: Store): Promise<void> {
   return next;
 }
 
-function unauthorized(origin: string): Response {
+function unauthorized(origin: string, description?: string): Response {
   const metadata = `${origin}/.well-known/oauth-protected-resource`;
   return json(
     {
       error: "unauthorized",
-      error_description: "Send Authorization: Bearer with an OAuth access token, an lc_ API key, a Neon Auth session token, or the operator token.",
+      error_description: description || "Send Authorization: Bearer with an OAuth access token, an lc_ API key, a Neon Auth session token, or the operator token.",
       resource: canonicalResource(origin),
     },
     401,

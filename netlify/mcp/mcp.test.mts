@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, generateKeyPairSync, randomUUID, sign } from "node:crypto";
 import { test } from "node:test";
 import { hashPassword } from "@better-auth/utils/password";
 import {
@@ -177,6 +177,58 @@ test("a normal user cannot list other accounts", async () => {
     publicUrl: ORIGIN,
   });
   assert.equal(revoked.status, 401);
+});
+
+test("a Neon Auth JWT is the signed-in user, and an expired one says so", async () => {
+  const store = new MemoryStore();
+  const userId = await seedUser(store, "jwt@example.com", "user");
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+  const jwk = publicKey.export({ format: "jwk" });
+  const keys = [{ kid: "test-key", kty: "OKP", crv: "Ed25519", x: String(jwk.x) }];
+  const jwksUrl = "https://auth.example/.well-known/jwks.json";
+  const now = 1_800_000_000;
+  const token = signJwt(privateKey, { iss: "https://auth.example", aud: "https://auth.example", sub: userId, exp: now + 60 }, "test-key");
+  const me = await tool(store, token, "get_current_user", {}, { now, jwksUrl, jwksKeys: keys });
+  assert.equal(me.method, "neon_session");
+  assert.equal(me.userId, userId);
+  assert.equal(me.admin, false);
+
+  const expired = signJwt(privateKey, { iss: "https://auth.example", aud: "https://auth.example", sub: userId, exp: now - 120 }, "test-key");
+  const rejected = await handleHttp(rpc({ jsonrpc: "2.0", id: 1, method: "tools/list" }, expired), {
+    store,
+    sharedSecret: SECRET,
+    publicUrl: ORIGIN,
+    now,
+    jwksUrl,
+    jwksKeys: keys,
+  });
+  assert.equal(rejected.status, 401);
+  const body = (await rejected.json()) as { error_description: string };
+  assert.match(body.error_description, /expired/);
+
+  const tampered = `${token.slice(0, -4)}aaaa`;
+  const bad = await handleHttp(rpc({ jsonrpc: "2.0", id: 1, method: "tools/list" }, tampered), {
+    store,
+    sharedSecret: SECRET,
+    publicUrl: ORIGIN,
+    now,
+    jwksUrl,
+    jwksKeys: keys,
+  });
+  assert.equal(bad.status, 401);
+  const badBody = (await bad.json()) as { error_description: string };
+  assert.equal(badBody.error_description.includes("expired"), false);
+
+  await store.banUser(userId, "test", null);
+  const banned = await handleHttp(rpc({ jsonrpc: "2.0", id: 1, method: "tools/list" }, token), {
+    store,
+    sharedSecret: SECRET,
+    publicUrl: ORIGIN,
+    now,
+    jwksUrl,
+    jwksKeys: keys,
+  });
+  assert.equal(banned.status, 401);
 });
 
 test("Neon session tokens and unknown passwords", async () => {
@@ -368,16 +420,23 @@ async function token(store: MemoryStore, fields: Record<string, string>): Promis
   );
 }
 
-async function tool(store: MemoryStore, bearer: string, name: string, args: Record<string, unknown>): Promise<any> {
-  const payload = await toolRaw(store, bearer, name, args);
+function signJwt(privateKey: ReturnType<typeof generateKeyPairSync>["privateKey"], payload: Record<string, unknown>, kid: string): string {
+  const header = Buffer.from(JSON.stringify({ alg: "EdDSA", kid, typ: "JWT" })).toString("base64url");
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = sign(null, Buffer.from(`${header}.${body}`), privateKey).toString("base64url");
+  return `${header}.${body}.${signature}`;
+}
+
+async function tool(store: MemoryStore, bearer: string, name: string, args: Record<string, unknown>, options: Record<string, unknown> = {}): Promise<any> {
+  const payload = await toolRaw(store, bearer, name, args, options);
   assert.equal(payload.result?.isError, undefined);
   return JSON.parse(payload.result.content[0].text);
 }
 
-async function toolRaw(store: MemoryStore, bearer: string, name: string, args: Record<string, unknown>): Promise<any> {
+async function toolRaw(store: MemoryStore, bearer: string, name: string, args: Record<string, unknown>, options: Record<string, unknown> = {}): Promise<any> {
   const response = await handleHttp(
     rpc({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }, bearer),
-    { store, sharedSecret: SECRET, publicUrl: ORIGIN },
+    { store, sharedSecret: SECRET, publicUrl: ORIGIN, ...options },
   );
   assert.equal(response.status, 200);
   return response.json();
