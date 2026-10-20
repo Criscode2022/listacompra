@@ -34,3 +34,7 @@ Workflow: `.github/workflows/ci.yml`. Push y PR a `main`. Un solo job, `cancel-i
 | Build rota el PWA | El job incluye `npm run build` |
 
 Badge en el README: `CI` → ese workflow.
+
+## Lo que falta en el workflow
+
+Los 11 tests del servidor MCP (`npm run test:mcp`) no se ejecutan en CI. Añadirlos pide subir el job a Node 22: el script usa `--experimental-strip-types` para correr TypeScript sin compilar, y Node 20 no lo tiene.

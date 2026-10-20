@@ -4,11 +4,21 @@ title: Testing · unitarios
 
 # Testing · unitarios
 
-Runner: `npm run test:ci` (ChromeHeadless, un solo run). Specs en `*.spec.ts`.
+Runner: `npm run test:ci` (Karma con ChromeHeadless, una sola pasada). **36 tests en 11 specs**, en unos 0,1 segundos de ejecución.
 
-## DataService (`src/app/core/services/data-service/data.service.spec.ts`)
+| Spec                                    | Tests | Qué fija                                                                                       |
+| --------------------------------------- | ----- | ---------------------------------------------------------------------------------------------- |
+| `notification.service.spec.ts`          | 9     | Permisos, preferencias y el recordatorio diario                                                |
+| `tabs.page.spec.ts`                     | 7     | Barra de pestañas, barra lateral de escritorio y el panel de ajustes (hoja en móvil, diálogo en escritorio) |
+| `data.service.spec.ts`                  | 5     | Cargar, marcar, borrar y vaciar productos                                                      |
+| `header.component.spec.ts`              | 5     | Clases del cristal, tinte de urgente, acción principal y botón de vaciar                       |
+| `liquid-glass.tokens.spec.ts`           | 3     | Que las variables CSS del diseño existen tras cargar el tema                                   |
+| `breakpoints.spec.ts`                   | 2     | El corte de escritorio en 1200 px                                                              |
+| `app.component`, `stop-propagation`, `tab-list`, `tab-pantry`, `tab-urgent` | 1 cada uno | Que se crean |
 
-`SqliteService` se sustituye por un spy. Así se afirma el contrato de signals **sin** WASM.
+## DataService
+
+`SqliteService` se sustituye por un spy. Así se fija el contrato de los signals **sin** cargar el WASM de sql.js.
 
 ```ts
 it('loads products from SQLite on start', async () => {
@@ -27,12 +37,14 @@ it('toggles checked status and resets quantity when checked', async () => {
 });
 ```
 
-También se afirma `delete` por nombre y `clearStorage()` (llama a `sqlite.clearAll()` y deja `products` vacío).
+También se fija el borrado por nombre y `clearStorage()`, que llama a `sqlite.clearAll()` y deja `products` vacío.
 
-`whenReady()` es obligatorio: el constructor es async (`void this.load()`). Sin await, el test leería `[]`.
+`whenReady()` es obligatorio: el constructor carga de forma asíncrona (`void this.load()`) y sin esperar el test leería `[]`.
 
-## Otras piezas
+## Notificaciones
 
-- Tabs (`tab-list`, `tab-pantry`, `tab-urgent`, `tabs.page`) — creación del componente.
-- `HeaderComponent`, `AppComponent`, directiva `stop-propagation`.
-- `NotificationService` y tokens de liquid-glass (`src/theme/liquid-glass.tokens.spec.ts`).
+`NotificationService` se prueba con un `Notification` falso en `window` cuyo `requestPermission` es un spy. Los casos cubren que activar pide permiso y guarda la preferencia solo si se concede, que desactivar apaga la preferencia general, que `show()` devuelve `false` si las notificaciones no están activadas, y que el recordatorio diario avisa una vez al día cuando hay productos urgentes o pendientes, y no avisa cuando no hay nada.
+
+## Pestañas y cabecera
+
+Los specs de `TabsPage` y `HeaderComponent` comprueban lo que se pinta: la barra con efecto cristal, la barra lateral con los tres destinos en escritorio, que en la pestaña de urgentes el carril de compra se oculta a partir de 1200 px, y que el panel de ajustes se abre como hoja en móvil y como diálogo centrado en escritorio.
