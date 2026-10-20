@@ -1,0 +1,23 @@
+name: Portfolio docs
+
+# cristiancode.dev reads docs/ when it builds, so rebuild it when they change.
+# PORTFOLIO_BUILD_HOOK is a Netlify build hook URL for the portfolio site.
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**"]
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebuild the portfolio
+        env:
+          HOOK: ${{ secrets.PORTFOLIO_BUILD_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::PORTFOLIO_BUILD_HOOK is not set, so the portfolio shows these docs after its next deploy."
+            exit 0
+          fi
+          curl -fsS -X POST -d '{}' "$HOOK?trigger_title=Docs+changed+in+$GITHUB_REPOSITORY"

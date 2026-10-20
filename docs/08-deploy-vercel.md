@@ -35,7 +35,7 @@ title: Deploy Netlify
   status = 200
 ```
 
-Live: [lalistadelacompra.netlify.app](https://lalistadelacompra.netlify.app/).
+Live: [listacompra.cristiancode.dev](https://listacompra.cristiancode.dev/).
 
 ## Android
 

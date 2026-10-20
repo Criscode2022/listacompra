@@ -10,7 +10,7 @@ Es **una sola app Angular/Ionic** (no monorepo Nest). En producción Netlify sir
 
 ## Enlaces
 
-- **Web:** [https://lalistadelacompra.netlify.app](https://lalistadelacompra.netlify.app/)
+- **Web:** [https://listacompra.cristiancode.dev](https://listacompra.cristiancode.dev/)
 - **GitHub:** [Criscode2022/listacompra](https://github.com/Criscode2022/listacompra)
 - **CI:** [GitHub Actions `ci.yml`](https://github.com/Criscode2022/listacompra/actions/workflows/ci.yml)
 

@@ -4,7 +4,7 @@ title: Testing · e2e
 
 # Testing · e2e
 
-Este repo **no** incluye Playwright. El flujo de compra (alta → checkbox → PDF) se valida a mano en [lalistadelacompra.netlify.app](https://lalistadelacompra.netlify.app/) y con los unitarios de `DataService`.
+Este repo **no** incluye Playwright. El flujo de compra (alta → checkbox → PDF) se valida a mano en [listacompra.cristiancode.dev](https://listacompra.cristiancode.dev/) y con los unitarios de `DataService`.
 
 ## Por qué no está en CI
 
