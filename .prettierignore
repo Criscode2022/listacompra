@@ -1,0 +1,20 @@
+# Copied from official sources. Keep them exactly as published; scripts/update-agent-files.sh refreshes them.
+AGENTS.md
+GEMINI.md
+.agents/skills/*
+.claude/skills/
+third_party/
+
+# Skills written for this repository (SKILLS.lock.md lists them) are formatted like the rest of the code.
+!.agents/skills/ai-elements/
+!.agents/skills/angular-material/
+!.agents/skills/angular-native/
+!.agents/skills/angular-ssr/
+!.agents/skills/ionic-pwa/
+!.agents/skills/neon-data-api-rls/
+!.agents/skills/pen-dev-angular/
+!.agents/skills/tailwind-angular/
+
+# Written by scripts/update-agent-files.sh and the skills CLI
+SKILLS.lock.md
+skills-lock.json

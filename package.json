@@ -4,6 +4,7 @@
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
+    "update-from-template": "node scripts/update-from-template.mjs",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",

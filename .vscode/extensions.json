@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    "angular.ng-template",
+    "highagency.pencildev",
     "Webnative.webnative"
   ]
 }

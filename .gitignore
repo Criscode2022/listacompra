@@ -72,3 +72,13 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# From angular-ai-template: secrets, editor files, and the caches its tools write.
+!.vscode/mcp.json
+.nx/
+__screenshots__/
+.mcp.json.local
+.claude/settings.local.json
+*.pem
+*.key
+._*
