@@ -32,6 +32,7 @@ The skills live in `.agents/skills/`. Claude Code reaches the same folders throu
 - **UI:** Load `frontend-design`, then `impeccable`, and follow both. Do not ask whether to use them. Impeccable chooses the layout and builds it. Do not ask the user to choose among layouts, directions, or comps unless the user explicitly asks to see options or to pick one. No generic AI styling: no decorative gradients, no identical card grids, no all-caps eyebrow labels, no motion nobody asked for.
 - **UI libraries:** Spartan UI and Tailwind CSS are already installed. Load `spartan` for components and `tailwind-angular` for utilities. Theme both from the tokens in `src/styles.scss`. The brand fill is `bg-primary`. Spartan's `bg-accent` is a hover surface, not the brand. Load `ai-elements` for conversation UI (messages, a prompt, reasoning, tool calls, sources). Load `angular-material` only when the user asks for Angular Material or `package.json` already has `@angular/material`. Ionic and Angular Native keep the component rules in their own skills.
 - **Every code change:** `clean-code`.
+- **Reviewing a change:** `change-review`, before you commit or hand over a change, and whenever the user asks for a code review. It reads `REVIEW.md` and scales the review, and the human approval, to the change's risk.
 - **Neon data and access rules:** `neon-data-api-rls` for tables, RLS policies, roles, and Data API calls from Angular. `neon-auth`, Neon's official skill, for the login flow.
 - **Designs in pen.dev:** `pen-dev-angular` for anything on the pen.dev canvas or in a `.pen` file, together with `frontend-design` and `impeccable`. It loads pen.dev's own instructions through the `pencil` MCP server.
 
@@ -55,6 +56,7 @@ Skills are instructions. The MCP servers are the action layer.
 - `templates/webmcp.example.ts`: the WebMCP template. Do not register WebMCP tools in `src/` unless the user asks.
 - `design/`: pen.dev design files (`.pen`), once the project has any. Change them only in pen.dev or through its `pencil` MCP tools, never as text.
 - `preferences.json`: the app type (see above). `scripts/onboarding.mjs` asks for it.
+- `REVIEW.md`: what a review checks in this app: what failure looks like, the high-risk paths, the paths to skip, and past misses. The app owns it; the template only starts it. Add to it when a review misses a bug.
 - `scripts/update-from-template.mjs`: brings the template's updates into an app. `TEMPLATE_PATHS` at its top lists the files the template owns. In an app, change those only when the change belongs in the template too; the app's own rules go in APP.md.
 
 ## On top of AGENTS.md
@@ -99,4 +101,5 @@ Do not edit these by hand: Angular's text in `AGENTS.md` (everything above its p
 - `ng test` passes (`run_target` with `test`), with tests for any behavior you changed.
 - For an `ssr`, `ionic-pwa`, or `angular-native` app, the checks at the end of that type's skill pass too.
 - `npm run test:scripts` passes if you changed anything in `scripts/`.
+- `change-review` leaves no open Important finding, and a high-risk change waits for the owner's approval.
 - No secrets, connection strings, or tokens in tracked files.

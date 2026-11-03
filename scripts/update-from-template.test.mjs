@@ -179,14 +179,116 @@ describe('update-from-template', () => {
 
   it("adds starter files that an older app doesn't have yet, like preferences.json", async () => {
     const { template, app } = await createTemplateAndApp();
-    await writeFiles(template, { 'preferences.json': '{\n  "appType": ""\n}\n' });
-    commitAll(template, 'Add preferences.json');
+    await writeFiles(template, {
+      'preferences.json': '{\n  "appType": ""\n}\n',
+      'REVIEW.md': '# Review\n',
+    });
+    commitAll(template, 'Add preferences.json and REVIEW.md');
 
     const result = runUpdate(app);
 
     assert.equal(result.status, 0, result.stderr);
     assert.equal(await read(app, 'preferences.json'), '{\n  "appType": ""\n}\n');
+    assert.equal(await read(app, 'REVIEW.md'), '# Review\n');
     assert.ok(staged(app).includes('preferences.json'));
+    assert.ok(staged(app).includes('REVIEW.md'));
+  });
+
+  it('leaves a starter file deleted once the app has deleted it', async () => {
+    const { template, app } = await createTemplateAndApp();
+    git(app, 'rm', '-q', 'APP.md');
+    commitAll(app, 'Remove APP.md');
+    await writeFiles(template, { 'PROJECT.md': '# Project rules, second version\n' });
+    commitAll(template, 'Change the rules');
+
+    const result = runUpdate(app);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.ok(!staged(app).includes('APP.md'));
+    await assert.rejects(read(app, 'APP.md'));
+  });
+
+  /** An app whose older update script recorded a template version that has REVIEW.md, without adding it. */
+  async function appUpdatedByAnOlderScript() {
+    const fixture = await createTemplateAndApp();
+    await writeFiles(fixture.template, { 'REVIEW.md': '# Review\n' });
+    commitAll(fixture.template, 'Add REVIEW.md');
+    const recorded = git(fixture.template, 'rev-parse', 'HEAD').trim();
+    await writeFiles(fixture.app, {
+      '.template-version': `# Written by an older script\n${recorded}\n`,
+    });
+    commitAll(fixture.app, 'Update from the template with an older script');
+    return fixture;
+  }
+
+  it('adds a starter file that an older script recorded without adding, even when up to date', async () => {
+    const { app } = await appUpdatedByAnOlderScript();
+
+    const result = runUpdate(app);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Already up to date/);
+    assert.equal(await read(app, 'REVIEW.md'), '# Review\n');
+    assert.ok(staged(app).includes('REVIEW.md'));
+  });
+
+  it('adds a starter file that an older script recorded without adding, once the template moves on', async () => {
+    const { template, app } = await appUpdatedByAnOlderScript();
+    await writeFiles(template, { 'PROJECT.md': '# Project rules, second version\n' });
+    commitAll(template, 'Change the rules');
+
+    const result = runUpdate(app);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(await read(app, 'REVIEW.md'), '# Review\n');
+    assert.ok(staged(app).includes('REVIEW.md'));
+  });
+
+  it('leaves a starter file deleted when a merged branch added and deleted it', async () => {
+    const { app } = await appUpdatedByAnOlderScript();
+    git(app, 'checkout', '-q', '-b', 'review-rules');
+    await writeFiles(app, { 'REVIEW.md': '# Review\n' });
+    commitAll(app, 'Add REVIEW.md');
+    git(app, 'rm', '-q', 'REVIEW.md');
+    commitAll(app, 'Remove REVIEW.md');
+    git(app, 'checkout', '-q', 'main');
+    git(app, 'merge', '-q', '--no-ff', '-m', 'Merge review-rules', 'review-rules');
+
+    const result = runUpdate(app);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.ok(!staged(app).includes('REVIEW.md'));
+    await assert.rejects(read(app, 'REVIEW.md'));
+  });
+
+  it('waits for the full history before adding a starter file in a shallow clone', async () => {
+    const { template, app } = await appUpdatedByAnOlderScript();
+    const shallow = join(workspace, `shallow-${fixtureCount}`);
+    git(workspace, 'clone', '-q', '--depth', '1', `file://${app}`, shallow);
+    git(shallow, 'remote', 'add', 'template', template);
+
+    const result = runUpdate(shallow);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.ok(!staged(shallow).includes('REVIEW.md'));
+    assert.match(result.stdout, /git fetch --unshallow/);
+  });
+
+  it("never changes an app's REVIEW.md once it has one", async () => {
+    const { template, app } = await createTemplateAndApp();
+    await writeFiles(template, { 'REVIEW.md': '# Review\n' });
+    commitAll(template, 'Add REVIEW.md');
+    assert.equal(runUpdate(app).status, 0);
+    await writeFiles(app, { 'REVIEW.md': "# Review\n\nThis app's own rules.\n" });
+    commitAll(app, "Write this app's review rules");
+    await writeFiles(template, { 'REVIEW.md': '# Review, rewritten\n' });
+    commitAll(template, 'Rewrite the starter REVIEW.md');
+
+    const result = runUpdate(app);
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(await read(app, 'REVIEW.md'), "# Review\n\nThis app's own rules.\n");
+    assert.ok(!staged(app).includes('REVIEW.md'));
   });
 
   it('merges a file that the app and the template changed in different places', async () => {

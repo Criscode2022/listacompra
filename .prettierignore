@@ -10,6 +10,7 @@ third_party/
 !.agents/skills/angular-material/
 !.agents/skills/angular-native/
 !.agents/skills/angular-ssr/
+!.agents/skills/change-review/
 !.agents/skills/ionic-pwa/
 !.agents/skills/neon-data-api-rls/
 !.agents/skills/pen-dev-angular/

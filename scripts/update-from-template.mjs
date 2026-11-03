@@ -15,7 +15,7 @@ const TEMPLATE_BRANCH = 'main';
 const VERSION_FILE = '.template-version';
 
 // The files the template owns. Everything else belongs to the app: its code, package.json,
-// angular.json, preferences.json, README.md, APP.md, and any skill or script the app adds.
+// angular.json, preferences.json, README.md, APP.md, REVIEW.md, and any skill or script the app adds.
 export const TEMPLATE_PATHS = [
   '.agents/skills/',
   '.claude/skills/',
@@ -41,7 +41,7 @@ export const TEMPLATE_PATHS = [
 
 // Files the app owns, but that the template starts it with. An app made before the template had
 // one of them gets it once; after that, the update never changes it.
-const STARTER_FILES = ['APP.md', 'preferences.json'];
+const STARTER_FILES = ['APP.md', 'preferences.json', 'REVIEW.md'];
 
 const REGULAR_FILE_MODES = new Set(['100644', '100755']);
 
@@ -241,9 +241,28 @@ function applyPlan(path, plan, versions, target, report) {
   }
 }
 
+/**
+ * Gives the app each starter file it has never had. The app's own history decides: a file that
+ * appears in it was given before, so if it's missing now, the app deleted it, and it stays
+ * deleted. The template's history can't decide this, because an older copy of this script may
+ * have recorded a template version without adding the file. --full-history keeps git from
+ * hiding a merged branch that added and then deleted the file, and a shallow clone doesn't hold
+ * enough history to tell, so there the files wait until the clone is complete.
+ */
 function addMissingStarterFiles(target, report) {
+  const templateHasIt = (path) =>
+    gitOrUndefined(['cat-file', '-e', `${target}:${path}`]) !== undefined;
+  const appEverHadIt = (path) =>
+    Boolean(gitOrUndefined(['log', '-1', '--full-history', '--format=%H', 'HEAD', '--', path]));
+  const shallow = gitOrUndefined(['rev-parse', '--is-shallow-repository']) === 'true';
   for (const path of STARTER_FILES) {
-    if (existsSync(path) || gitOrUndefined(['cat-file', '-e', `${target}:${path}`]) === undefined) {
+    if (existsSync(path) || !templateHasIt(path) || appEverHadIt(path)) {
+      continue;
+    }
+    if (shallow) {
+      report.kept.push(
+        `${path}: this clone is shallow, so its history can't show whether the app deleted it. Run git fetch --unshallow, then update again.`,
+      );
       continue;
     }
     git(['checkout', target, '--', path]);
@@ -295,13 +314,26 @@ Next:
   git reset --hard                           undo this update`);
 }
 
+const newReport = () => ({
+  updated: [],
+  added: [],
+  removed: [],
+  merged: [],
+  kept: [],
+  conflicts: [],
+});
+
 function main() {
   process.chdir(git(['rev-parse', '--show-toplevel']).trim());
   checkWorkingTree();
   const target = connectTemplate();
   const { base, howFound } = findStartingPoint(target);
   if (base === target) {
+    // An older copy of this script may have recorded this version without its starter files.
+    const report = newReport();
+    addMissingStarterFiles(target, report);
     console.log(`Already up to date with the template (${target.slice(0, 7)}).`);
+    if (report.added.length > 0 || report.kept.length > 0) printReport(report, []);
     return 0;
   }
 
@@ -318,7 +350,7 @@ function main() {
   const baseEntries = base ? listEntries(base) : new Map();
   const targetEntries = listEntries(target);
   const appEntries = listEntries();
-  const report = { updated: [], added: [], removed: [], merged: [], kept: [], conflicts: [] };
+  const report = newReport();
   const paths = [...new Set([...baseEntries.keys(), ...targetEntries.keys()])].sort();
   for (const path of paths) {
     const versions = {
