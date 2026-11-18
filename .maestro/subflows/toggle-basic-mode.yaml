@@ -1,0 +1,17 @@
+# Opens Configuración, flips the Modo básico toggle, and closes the dialog.
+# The Modo básico toggle is the only one below the "Apariencia" section title.
+# Maestro's web driver scrolls the window, not Ionic's scroll containers, so the toggle must fit
+# on screen: it does in the default headed window (page area 1200x802) and in headless runs
+# with --screen-size 1280x1000.
+url: http://localhost:4200
+---
+- tapOn: "Configuración"
+- assertVisible: "Modo básico"
+- tapOn:
+    id: "ion-tg-.*"
+    below: "Apariencia"
+- tapOn:
+    id: "close"
+    childOf:
+      id: "ion-overlay-.*"
+- assertNotVisible: "Modo básico"

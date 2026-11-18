@@ -7,6 +7,10 @@
     "Neon": {
       "type": "http",
       "url": "https://mcp.neon.tech/mcp"
+    },
+    "maestro": {
+      "command": "node",
+      "args": ["scripts/maestro-mcp.mjs"]
     }
   }
 }

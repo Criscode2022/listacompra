@@ -1,0 +1,62 @@
+# Products are stored on the device (SQLite saved to IndexedDB), so a reload keeps every
+# product, its quantity, whether it was bought, and the urgent list.
+url: http://localhost:4200
+name: Persistence across reloads
+tags:
+  - persistence
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Leche
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Pan
+      QUANTITY: "3"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      OPEN_WITH: ".*Añadir urgente.*"
+      NAME: Pilas
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- tapOn: "Leche"
+- assertVisible: "1 producto en la lista"
+
+# Reload without clearing storage.
+- launchApp
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "1 producto en la lista"
+- assertVisible: "Pan"
+- assertNotVisible: "Leche"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- assertVisible: "2 productos · 1 por comprar"
+- assertVisible:
+    text: "3ud"
+    childOf:
+      id: "Lista de la compra"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- assertVisible: "1 urgente"
+- assertVisible: "Pilas"

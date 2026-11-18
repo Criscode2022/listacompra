@@ -1,0 +1,80 @@
+# A product's whole cycle: it is added to the Despensa (out of stock, so it lands on the Lista),
+# gets bought from the Lista, then runs out again in the Despensa and returns to the Lista
+# with its quantity reset to 1.
+url: http://localhost:4200
+name: Restock cycle
+tags:
+  - pantry
+  - list
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Plátanos
+      QUANTITY: "2"
+      UNIT: kg
+      CATEGORY: Frutas
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Leche
+
+# New products start out of stock: both show in the "Por comprar" rail, with their quantities.
+- assertVisible: "2 productos · 2 por comprar"
+- assertVisible:
+    text: "2kg"
+    childOf:
+      id: "Lista de la compra"
+- assertVisible:
+    text: "1ud"
+    childOf:
+      id: "Lista de la compra"
+
+# Buy the bananas from the Lista.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "2 productos en la lista"
+- assertVisible: "Leche"
+- tapOn: "Plátanos"
+- assertNotVisible: "Plátanos"
+- assertVisible: "1 producto en la lista"
+
+# Back in the Despensa they are in stock: still listed, but gone from the rail.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- assertVisible: "2 productos · 1 por comprar"
+- assertVisible:
+    text: "Plátanos"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible:
+    text: "Plátanos"
+    childOf:
+      id: "Lista de la compra"
+
+# They run out again. Buying reset the quantity, so they return as 1 kg.
+- tapOn:
+    text: "Plátanos"
+    leftOf:
+      id: "Lista de la compra"
+- assertVisible: "2 productos · 2 por comprar"
+- assertVisible:
+    text: "1kg"
+    childOf:
+      id: "Lista de la compra"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "2 productos en la lista"
+- assertVisible: "Plátanos"

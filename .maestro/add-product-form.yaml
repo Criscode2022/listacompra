@@ -1,0 +1,73 @@
+# The add-product dialog: it won't save a blank name, caps names at 30 characters, cancels
+# without saving, saves on Enter, and rejects a duplicate name regardless of case.
+url: http://localhost:4200
+name: Add-product form
+tags:
+  - pantry
+  - form
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- tapOn: ".*Añadir producto.*"
+- assertVisible: "Nuevo producto"
+- assertVisible: "0/30"
+
+# With no name, or only spaces, "Añadir" is disabled and the dialog stays open.
+- tapOn:
+    text: '\s*Añadir\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertVisible: "Nuevo producto"
+- tapOn:
+    text: "Ej: Leche, Pan, Manzanas..."
+    childOf:
+      id: "ion-overlay-.*"
+- inputText: "   "
+- tapOn:
+    text: '\s*Añadir\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertVisible: "Nuevo producto"
+
+# The name field stops at 30 characters. Tapping "Añadir" took the focus away, so tap back into
+# the field: it now shows the three spaces instead of its placeholder.
+- tapOn:
+    text: '\s+'
+    below: ".*Nombre del producto.*"
+    childOf:
+      id: "ion-overlay-.*"
+- eraseText
+- inputText: "Un nombre de producto demasiado largo"
+- assertVisible: "30/30"
+
+# Cancelling saves nothing.
+- tapOn:
+    text: "Cancelar"
+    childOf:
+      id: "ion-overlay-.*"
+- assertNotVisible: "Nuevo producto"
+- assertVisible: "Despensa vacía"
+
+# Enter saves.
+- tapOn: ".*Añadir producto.*"
+- tapOn:
+    text: "Ej: Leche, Pan, Manzanas..."
+    childOf:
+      id: "ion-overlay-.*"
+- inputText: "Leche"
+- pressKey: Enter
+- assertNotVisible: "Nuevo producto"
+- assertVisible: "1 producto · 1 por comprar"
+
+# The same name in capitals is a duplicate: it is refused and the count doesn't change.
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: LECHE
+# Snackbar text is wrapped in whitespace and newlines, hence \s* around it.
+- assertVisible: '\s*Producto ya existente\s*'
+- assertVisible: "1 producto · 1 por comprar"

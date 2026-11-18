@@ -1,0 +1,54 @@
+# Opens the add-product dialog on the current tab, fills it in and saves.
+# Params (a subflow's own env defaults would override the caller's values, so optional params
+# are guarded with typeof instead):
+#   NAME       product name (required)
+#   OPEN_WITH  regex for the button that opens the dialog; default ".*Añadir producto.*",
+#              Urgente uses ".*Añadir urgente.*"
+#   QUANTITY   optional; the dialog starts at 1 and each extra unit is one tap on the stepper,
+#              so keep it small
+#   UNIT       optional: ud | kg | g | l | ml | oz | lb; the dialog starts at ud
+#   CATEGORY   optional: a label from the first row (Frutas, Verduras, Carnes); the dialog starts
+#              at Otros. At the desktop window height the dialog footer covers the lower rows.
+# Elements behind an open dialog stay in the hierarchy, so every tap is scoped to the overlay.
+url: http://localhost:4200
+---
+- tapOn: "${typeof OPEN_WITH === 'undefined' ? '.*Añadir producto.*' : OPEN_WITH}"
+- assertVisible: "Nuevo producto.*"
+- tapOn:
+    text: "Ej: Leche, Pan, Manzanas..."
+    childOf:
+      id: "ion-overlay-.*"
+- inputText: ${NAME}
+- runFlow:
+    when:
+      true: "${typeof QUANTITY !== 'undefined' && QUANTITY !== ''}"
+    # eraseText can't clear a number input (the caret lands before the digit), so use the stepper.
+    commands:
+      - repeat:
+          times: "${QUANTITY - 1}"
+          commands:
+            - tapOn:
+                id: "add"
+                childOf:
+                  id: "ion-overlay-.*"
+- runFlow:
+    when:
+      true: "${typeof UNIT !== 'undefined' && UNIT !== ''}"
+    commands:
+      - tapOn:
+          text: '\s*${UNIT}\s*'
+          childOf:
+            id: "ion-overlay-.*"
+- runFlow:
+    when:
+      true: "${typeof CATEGORY !== 'undefined' && CATEGORY !== ''}"
+    commands:
+      - tapOn:
+          text: ${CATEGORY}
+          childOf:
+            id: "ion-overlay-.*"
+- tapOn:
+    text: '\s*Añadir\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertNotVisible: "Nuevo producto.*"

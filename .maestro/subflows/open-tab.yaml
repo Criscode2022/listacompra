@@ -1,0 +1,13 @@
+# Opens a tab from the desktop sidebar and waits for its page header.
+# Param: TAB = Despensa | Lista | Urgente
+# The brand name at the top of the sidebar also reads "Lista", so only links below the brand icon match.
+url: http://localhost:4200
+---
+- tapOn:
+    text: ${TAB}
+    childOf:
+      id: "Navegación principal"
+    below:
+      id: "bag-handle"
+- assertVisible:
+    id: ${TAB}

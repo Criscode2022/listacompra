@@ -1,0 +1,72 @@
+# Deleting. A single click on a row's ✕ deletes nothing. "Eliminar todos los productos" in
+# Configuración asks first: Cancelar keeps everything, Borrar empties every tab, urgent included.
+# Deleting one product needs a double click on its ✕, and Maestro's web driver sends a double tap
+# as two separate clicks, which never fire the browser's dblclick event, so that path isn't covered.
+url: http://localhost:4200
+name: Delete products
+tags:
+  - pantry
+  - settings
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      OPEN_WITH: ".*Añadir urgente.*"
+      NAME: Pilas
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Leche
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Pan
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Arroz
+- assertVisible: "3 productos · 3 por comprar"
+
+# One click on Pan's ✕ (the second row) keeps it.
+- tapOn:
+    id: "Doble click para eliminar"
+    index: 1
+- assertVisible: "3 productos · 3 por comprar"
+- assertVisible:
+    text: "Pan"
+    leftOf:
+      id: "Lista de la compra"
+
+# Delete everything from Configuración. Cancelar first. Configuración is an overlay too, so
+# `childOf: ion-overlay-.*` would find the modal under the alert; the alert's buttons are the only
+# Cancelar and Borrar on screen.
+- tapOn: "Configuración"
+- tapOn: "Eliminar todos los productos"
+- assertVisible: "Confirmar borrado"
+- tapOn: '\s*Cancelar\s*'
+- assertNotVisible: "Confirmar borrado"
+- tapOn: "Eliminar todos los productos"
+- assertVisible: "Confirmar borrado"
+- tapOn: '\s*Borrar\s*'
+- assertNotVisible: "Confirmar borrado"
+- assertVisible: "Despensa vacía"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "La lista está vacía"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- assertVisible: "Nada urgente"

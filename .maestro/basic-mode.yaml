@@ -1,0 +1,46 @@
+# Modo básico (Configuración > Apariencia) hides categories and filters, survives a reload,
+# and switching it off brings them back.
+url: http://localhost:4200
+name: Basic mode
+tags:
+  - settings
+  - persistence
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Lechuga
+      CATEGORY: Verduras
+- assertVisible: "Todo"
+- assertVisible:
+    id: "leaf-outline"
+
+- runFlow:
+    file: subflows/toggle-basic-mode.yaml
+- assertNotVisible: "Todo"
+- assertNotVisible:
+    id: "leaf-outline"
+
+# The setting is stored with the products.
+- launchApp
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- assertVisible:
+    text: "Lechuga"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible: "Todo"
+
+- runFlow:
+    file: subflows/toggle-basic-mode.yaml
+- assertVisible: "Todo"
+- assertVisible:
+    id: "leaf-outline"

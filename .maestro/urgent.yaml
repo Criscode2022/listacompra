@@ -1,0 +1,80 @@
+# Urgent products are one-off purchases: they live only in Urgente, a duplicate is refused there
+# and in the Despensa, and checking one off removes it for good.
+url: http://localhost:4200
+name: Urgent products
+tags:
+  - urgent
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- assertVisible: "Nada urgente"
+- assertVisible: "Sin compras de una sola vez"
+- tapOn: ".*Añadir urgente.*"
+- assertVisible: "Nuevo producto urgente"
+- tapOn:
+    text: "Cancelar"
+    childOf:
+      id: "ion-overlay-.*"
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      OPEN_WITH: ".*Añadir urgente.*"
+      NAME: Pilas
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      OPEN_WITH: ".*Añadir urgente.*"
+      NAME: Bombillas
+      QUANTITY: "3"
+- assertVisible: "2 urgentes"
+- assertVisible: "Pilas"
+- assertVisible: "Bombillas"
+
+# The same name again, in lower case, is refused.
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      OPEN_WITH: ".*Añadir urgente.*"
+      NAME: pilas
+- assertVisible: '\s*Producto urgente ya existente\s*'
+- assertVisible: "2 urgentes"
+
+# Urgent products stay out of the Despensa and the Lista.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- assertVisible: "Despensa vacía"
+- assertNotVisible: "Pilas"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "La lista está vacía"
+
+# The Despensa checks every product's name, urgent ones included, so "Pilas" is refused there too.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Pilas
+- assertVisible: '\s*Producto ya existente\s*'
+- assertVisible: "Despensa vacía"
+
+# Checking an urgent product off deletes it.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Urgente
+- tapOn: "Pilas"
+- assertNotVisible: "Pilas"
+- assertVisible: "1 urgente"
+- tapOn: "Bombillas"
+- assertVisible: "Nada urgente"

@@ -1,0 +1,78 @@
+# Editing a quantity from its badge in the Despensa: cancel keeps it, 0 is refused and the
+# dialog stays open, a valid number is saved and shows in the rail and on the Lista.
+url: http://localhost:4200
+name: Edit quantity
+tags:
+  - pantry
+  - form
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Huevos
+- assertVisible:
+    text: "1ud"
+    childOf:
+      id: "Lista de la compra"
+
+# The badge sits just right of the row's delete button. Matching that way skips the sidebar's
+# counters, which also read "1".
+- tapOn:
+    text: '\s*1'
+    rightOf:
+      id: "Doble click para eliminar"
+- assertVisible: "Editar cantidad"
+- tapOn:
+    text: '\s*Cancelar\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertNotVisible: "Editar cantidad"
+- assertVisible:
+    text: "1ud"
+    childOf:
+      id: "Lista de la compra"
+
+# 0 is refused: the dialog stays open.
+- tapOn:
+    text: '\s*1'
+    rightOf:
+      id: "Doble click para eliminar"
+- assertVisible: "Editar cantidad"
+# Clicking the input puts the caret after its value, so eraseText clears it.
+- tapOn:
+    id: "alert-input-.*"
+- eraseText
+- inputText: "0"
+- tapOn:
+    text: '\s*Guardar\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertVisible: '\s*La cantidad debe ser mayor que 0\s*'
+- assertVisible: "Editar cantidad"
+
+# 12 is saved.
+- tapOn:
+    id: "alert-input-.*"
+- eraseText
+- inputText: "12"
+- tapOn:
+    text: '\s*Guardar\s*'
+    childOf:
+      id: "ion-overlay-.*"
+- assertNotVisible: "Editar cantidad"
+- assertVisible:
+    text: "12ud"
+    childOf:
+      id: "Lista de la compra"
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "Huevos"
+- assertVisible: '\s*12'

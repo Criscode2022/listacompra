@@ -4,13 +4,13 @@ title: Testing · visión
 
 # Testing · visión
 
-Lista de la compra tiene **47 tests en dos suites**: 36 unitarios de la app Angular (Jasmine + Karma) y 11 del servidor MCP (`node:test`). Ninguno necesita Neon: la app sustituye SQLite por un spy y el MCP trabaja con un almacén en memoria. No hay Playwright.
+Lista de la compra tiene **47 tests en dos suites**: 36 unitarios de la app Angular (Jasmine + Karma) y 11 del servidor MCP (`node:test`). Ninguno necesita Neon: la app sustituye SQLite por un spy y el MCP trabaja con un almacén en memoria. No hay Playwright: los recorridos en el navegador los hacen 9 flujos de Maestro, en local.
 
 | Capa                                       | Runner                           | Tests | Qué cubre                                                                 | Comando             |
 | ------------------------------------------ | -------------------------------- | ----- | ------------------------------------------------------------------------- | ------------------- |
 | [Unitarios](./13-testing-unit.md)          | Jasmine + Karma (ChromeHeadless) | 36 en 11 specs | `DataService`, pestañas, cabecera, notificaciones, breakpoints, tokens de diseño | `npm run test:ci`   |
 | [Integración](./14-testing-integration.md) | `node:test` con TypeScript nativo | 11 en 1 fichero | El servidor MCP de punta a punta: OAuth con PKCE, CORS, tokens y herramientas | `npm run test:mcp` |
-| [E2E](./15-testing-e2e.md)                 | —                                | —     | No hay; el flujo de compra se revisa a mano                               | —                   |
+| [E2E](./15-testing-e2e.md)                 | Maestro (Chromium, fuera de CI)  | 9 flujos | Las tres pestañas, el diálogo de producto, urgentes, filtros, modo básico, borrado y recarga | `maestro test .maestro/` |
 | Lint                                       | ESLint con angular-eslint        | —     | TypeScript y plantillas                                                   | `npm run lint`      |
 | Build                                      | Angular CLI                      | —     | Que la PWA compila a `www/`                                               | `npm run build`     |
 

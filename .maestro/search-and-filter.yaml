@@ -1,0 +1,118 @@
+# Category chips and the search box, alone and combined, on the Despensa and on the Lista.
+# The Despensa's "Por comprar" rail repeats every name, so list checks are scoped to the left of it.
+url: http://localhost:4200
+name: Search and filter
+tags:
+  - pantry
+  - list
+  - filter
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Despensa
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Manzanas
+      CATEGORY: Frutas
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Plátanos
+      CATEGORY: Frutas
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Lechuga
+      CATEGORY: Verduras
+- runFlow:
+    file: subflows/add-product.yaml
+    env:
+      NAME: Pollo
+      CATEGORY: Carnes
+- assertVisible: "4 productos · 4 por comprar"
+
+# Category chip: only fruit.
+- tapOn: "Frutas"
+- assertVisible:
+    text: "Manzanas"
+    leftOf:
+      id: "Lista de la compra"
+- assertVisible:
+    text: "Plátanos"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible:
+    text: "Lechuga"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible:
+    text: "Pollo"
+    leftOf:
+      id: "Lista de la compra"
+
+# Chip and search together: fruit whose name contains "man".
+- tapOn:
+    id: "search text"
+- inputText: "man"
+- assertVisible:
+    text: "Manzanas"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible:
+    text: "Plátanos"
+    leftOf:
+      id: "Lista de la compra"
+
+# Back to every category; the search ignores case. The chip took the focus, so tap back into
+# the search box first.
+- tapOn: "Todo"
+- tapOn:
+    id: "search text"
+- eraseText
+- inputText: "LECH"
+- assertVisible:
+    text: "Lechuga"
+    leftOf:
+      id: "Lista de la compra"
+- assertNotVisible:
+    text: "Manzanas"
+    leftOf:
+      id: "Lista de la compra"
+
+# No match.
+- eraseText
+- inputText: "zzz"
+- assertVisible: "Sin coincidencias"
+- assertVisible: "No hay coincidencias para “zzz”."
+
+# Clearing the search shows everything again.
+- eraseText
+- assertVisible:
+    text: "Pollo"
+    leftOf:
+      id: "Lista de la compra"
+- assertVisible:
+    text: "Plátanos"
+    leftOf:
+      id: "Lista de la compra"
+
+# The Lista has its own filters.
+- runFlow:
+    file: subflows/open-tab.yaml
+    env:
+      TAB: Lista
+- assertVisible: "4 productos en la lista"
+- tapOn: "Verduras"
+- assertVisible: "Lechuga"
+- assertNotVisible: "Pollo"
+- assertNotVisible: "Manzanas"
+- tapOn: "Todo"
+- tapOn:
+    id: "search text"
+- inputText: "pl"
+- assertVisible: "Plátanos"
+- assertNotVisible: "Lechuga"
